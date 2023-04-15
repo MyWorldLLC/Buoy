@@ -1,12 +1,16 @@
 plugins {
     id 'groovy'
     id 'java-library'
+    id 'maven-publish'
 }
 
 repositories {
     mavenLocal()
     mavenCentral()
 }
+
+version = '0.0.1'
+group = 'com.myworldvw'
 
 dependencies {
     testImplementation 'org.codehaus.groovy:groovy:3.0.13'
@@ -16,6 +20,33 @@ dependencies {
 
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(19)
+
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.add('--enable-preview')
+}
+
+
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+
+publishing {
+    publications {
+        library(MavenPublication) {
+
+            artifactId = 'buoy'
+
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
 }
