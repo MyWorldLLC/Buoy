@@ -1,15 +1,19 @@
 package com.myworldvw.buoy.mapping;
 
+import com.myworldvw.buoy.NativeMapper;
+
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 
-public class FieldHandler {
+public class FieldHandler<T> implements MappingHandler<T> {
 
     protected final FieldModel model;
     protected final Field field;
+
+    protected volatile VarHandle handle;
 
     public FieldHandler(FieldModel model, Field field){
         this.model = model;
@@ -40,4 +44,11 @@ public class FieldHandler {
         return getSetter(layout).bindTo(ptr);
     }
 
+    @Override
+    public void fill(NativeMapper mapper, MemorySegment segment, T target) throws IllegalAccessException {
+        if(handle == null){
+            handle = getHandle(mapper.getLayout(target.getClass()));
+        }
+        field.set(target, handle);
+    }
 }

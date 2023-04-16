@@ -1,6 +1,6 @@
 package com.myworldvw.buoy;
 
-import com.myworldvw.buoy.mapping.ObjectModel;
+import com.myworldvw.buoy.mapping.StructModel;
 
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
@@ -15,8 +15,7 @@ public class NativeMapper {
     protected final SymbolLookup lookup;
 
     protected final Map<String, MemoryLayout> structs;
-    protected final Map<String, FunctionDescriptor> functions;
-    protected final Map<String, MethodHandle> functionHandles;
+    protected final Map<String, MethodHandle> cachedFunctionHandles;
 
     public NativeMapper(){
         this(Linker.nativeLinker().defaultLookup());
@@ -26,9 +25,8 @@ public class NativeMapper {
         this.lookup = lookup;
 
         structs = new HashMap<>();
-        functions = new HashMap<>();
 
-        functionHandles = new HashMap<>();
+        cachedFunctionHandles = new HashMap<>();
     }
 
     public void defineStruct(MemoryLayout structLayout){
@@ -37,20 +35,23 @@ public class NativeMapper {
                 structLayout);
     }
 
-    public MethodHandle defineFunction(String name, FunctionDescriptor functionDesc){
-        var fPtr = lookup.lookup(name)
-                .orElseThrow(() -> new IllegalArgumentException("Function not found: " + name));
+    public MemoryLayout getLayout(Class<?> targetType){
+        return null; // TODO
+    }
 
-        var handle = Linker.nativeLinker().downcallHandle(fPtr, functionDesc);
+    public MethodHandle defineOrGetFunction(String name, FunctionDescriptor functionDesc){
+        return cachedFunctionHandles.computeIfAbsent(name, (n) -> {
+            var fPtr = lookup.lookup(name)
+                    .orElseThrow(() -> new IllegalArgumentException("Function not found: " + name));
 
-        functions.put(name, functionDesc);
-        functionHandles.put(name, handle);
+            var handle = Linker.nativeLinker().downcallHandle(fPtr, functionDesc);
 
-        return handle;
+            return handle;
+        });
     }
 
     public MethodHandle getFunction(String name){
-        var handle = functionHandles.get(name);
+        var handle = cachedFunctionHandles.get(name);
         if(handle == null){
             throw new IllegalArgumentException("Function has not been mapped: " + name);
         }
@@ -58,13 +59,27 @@ public class NativeMapper {
         return handle;
     }
 
-    public NativeMapper register(Class<?> structModel){
-        // TODO
+    public NativeMapper register(Class<?> targetType){
+        // TODO - define structs & functions from annotations
         return this;
     }
 
-    public Object populate(Object structModel){
-        return structModel;
+    public Object populateStruct(Object target){
+        return target;
+    }
+
+    public Object populateStruct(Object target, StructModel model){
+        return target;
+    }
+
+    public Object populateFunctions(Object target){
+        return target;
+    }
+
+    public Object populate(Object target){
+        populateStruct(target);
+        populateFunctions(target);
+        return target;
     }
 
 }
