@@ -9,5 +9,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface CStruct {
     String name();
+    boolean packed() default false;
     StructField[] fields() default {};
 }

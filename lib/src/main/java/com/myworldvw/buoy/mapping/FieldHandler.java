@@ -8,14 +8,14 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 
-public class FieldHandler<T> implements MappingHandler<T> {
+public class FieldHandler<T> implements StructMappingHandler<T> {
 
-    protected final FieldModel model;
+    protected final FieldDef model;
     protected final Field field;
 
     protected volatile VarHandle handle;
 
-    public FieldHandler(FieldModel model, Field field){
+    public FieldHandler(FieldDef model, Field field){
         this.model = model;
         this.field = field;
     }

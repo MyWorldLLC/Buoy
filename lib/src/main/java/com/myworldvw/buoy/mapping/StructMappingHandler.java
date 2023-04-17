@@ -4,7 +4,7 @@ import com.myworldvw.buoy.NativeMapper;
 
 import java.lang.foreign.MemorySegment;
 
-public interface MappingHandler<T> {
+public interface StructMappingHandler<T> {
 
     void fill(NativeMapper mapper, MemorySegment segment, T target) throws IllegalAccessException;
 

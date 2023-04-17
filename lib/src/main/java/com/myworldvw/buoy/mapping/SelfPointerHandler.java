@@ -1,12 +1,11 @@
 package com.myworldvw.buoy.mapping;
 
 import com.myworldvw.buoy.NativeMapper;
-import com.myworldvw.buoy.SelfPointer;
 
 import java.lang.foreign.MemorySegment;
 import java.lang.reflect.Field;
 
-public class SelfPointerHandler<T> implements MappingHandler<T> {
+public class SelfPointerHandler<T> implements StructMappingHandler<T> {
 
     protected final Field field;
 

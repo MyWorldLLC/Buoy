@@ -32,7 +32,31 @@ public class Platform {
         return null;
     }
 
+    public static Architecture detectArchitecture(){
+        var arch = System.getProperty("os.arch");
+        return switch (arch){
+            case "amd64" -> Architecture.AMD64;
+            case "x86" -> Architecture.X86;
+            case "ia64" -> Architecture.IA64;
+            case "unknown" -> Architecture.UNKNOWN;
+            default -> Architecture.UNKNOWN;
+        };
+    }
+
     public enum OperatingSystemFamily {
         LINUX, MAC_OSX, WINDOWS
+    }
+
+    public enum Architecture {
+        AMD64(64), IA64(64), X86(32), UNKNOWN(64);
+        int width;
+
+        Architecture(int width){
+            this.width = width;
+        }
+
+        public int width(){
+            return width;
+        }
     }
 }
