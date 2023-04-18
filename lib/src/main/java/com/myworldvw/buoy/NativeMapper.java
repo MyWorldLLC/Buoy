@@ -4,6 +4,9 @@ import com.myworldvw.buoy.mapping.*;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class NativeMapper {
@@ -231,9 +234,50 @@ public class NativeMapper {
         return this;
     }
 
-    public MethodHandle toCFunction(Object target, String method, MemorySession scope){
-        // TODO - reflectively get a method handle and create an upcall stub
-        return null;
+    public MemorySegment toCFunction(Object target, String method, MemorySession scope) throws IllegalAccessException {
+
+        var candidates = Arrays.stream(target.getClass().getMethods()).filter(m -> m.getName().equals(method)).toList();
+        if(candidates.size() > 1){
+            throw new IllegalArgumentException("Method %s is ambiguous for type %s".formatted(method, target.getClass()));
+        }
+
+        if(candidates.size() == 0){
+            throw new IllegalArgumentException("Method %s not found for type %s".formatted(method, target.getClass()));
+        }
+
+        return toCFunction(target, candidates.get(0), scope);
+    }
+
+    public MemorySegment toCFunction(Object target, String method, MemorySession scope, Class<?> retType, Class<?>... paramTypes) throws IllegalAccessException {
+
+        var candidate = Arrays.stream((target instanceof Class ? ((Class<?>) target) : target.getClass()).getMethods())
+                .filter(m -> m.getName().equals(method))
+                .filter(m -> m.getReturnType().equals(retType))
+                .filter(m -> Arrays.equals(m.getParameterTypes(), paramTypes))
+                .findFirst();
+
+        var m = candidate.orElseThrow(() -> new IllegalArgumentException("Method %s not found for type %s".formatted(method, target.getClass())));
+
+        return toCFunction(target, m, scope);
+    }
+
+    public MemorySegment toCFunction(Object target, Method method, MemorySession scope) throws IllegalAccessException {
+        var handle = MethodHandles.lookup().unreflect(method);
+        if((method.getModifiers() & Modifier.STATIC) != 0){
+            handle.bindTo(target);
+        }
+        return Platform.toCFunction(handle, getFunctionDescriptor(method), scope);
+    }
+
+    public FunctionDescriptor getFunctionDescriptor(Method m){
+        var rType = m.getReturnType();
+        var paramTypes = Arrays.stream(m.getParameterTypes())
+                .map(this::getLayout)
+                .toArray(MemoryLayout[]::new);
+
+        return rType.equals(void.class)
+                ? FunctionDescriptor.ofVoid(paramTypes)
+                : FunctionDescriptor.of(getLayout(rType), paramTypes);
     }
 
 }
