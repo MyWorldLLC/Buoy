@@ -5,6 +5,7 @@ import com.myworldvw.buoy.mapping.*;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -56,23 +57,47 @@ public class NativeMapper {
         structs.put(model.name(), model);
     }
 
-    public StructDef defineOrGetStruct(Class<?> type){
-        return structs.computeIfAbsent(type.getName(), (t) -> {
-            var structAnnotation = type.getAnnotation(CStruct.class);
-            if(structAnnotation != null){
-                var builder = StructDef.create(structAnnotation.name(), structAnnotation.packed());
-                for(var field : structAnnotation.fields()){
-                    builder.with(new FieldDef(field.index(), field.field(), field.type(), field.pointer()));
-                }
-                return builder.build();
+    protected CStruct getStructAnnotation(Class<?> type){
+        var annotation = type.getAnnotation(CStruct.class);
+        if(annotation == null){
+            throw new IllegalArgumentException("Class %s is not annotated with @CStruct".formatted(type.getName()));
+        }
+        return annotation;
+    }
+
+    public String getStructName(Class<?> type){
+        return getStructAnnotation(type).name();
+    }
+
+    public StructDef getStruct(Class<?> type){
+        return structs.get(getStructAnnotation(type).name());
+    }
+
+    public StructDef getStruct(String name){
+        return structs.get(name);
+    }
+
+    public boolean isStructDefined(String name){
+        return structs.containsKey(name);
+    }
+
+    public StructDef getOrDefineStruct(Class<?> type){
+        var struct = getStructAnnotation(type);
+        return structs.computeIfAbsent(struct.name(), (t) -> {
+
+            var builder = StructDef.create(struct.name(), struct.packed());
+            for (var field : struct.fields()) {
+                builder.with(new FieldDef(field.index(), field.field(), field.type(), field.pointer()));
             }
-            return null;
+
+            return builder.build();
         });
     }
 
     public MemoryLayout getLayout(Class<?> targetType){
         return layouts.computeIfAbsent(targetType, (t) -> {
-            var structDef = structs.get(targetType.getName());
+            var structAnnotation = getStructAnnotation(targetType);
+            var structDef = structs.get(structAnnotation.name());
             if(structDef == null){
                 throw new IllegalStateException("No struct definition found for class " + targetType.getName());
             }
@@ -80,14 +105,12 @@ public class NativeMapper {
         });
     }
 
-    public MethodHandle defineOrGetFunction(String name, FunctionDescriptor functionDesc){
+    public MethodHandle getOrDefineFunction(String name, FunctionDescriptor functionDesc){
         return cachedFunctionHandles.computeIfAbsent(name, (n) -> {
             var fPtr = lookup.lookup(name)
                     .orElseThrow(() -> new IllegalArgumentException("Function not found: " + name));
 
-            var handle = Linker.nativeLinker().downcallHandle(fPtr, functionDesc);
-
-            return handle;
+            return Linker.nativeLinker().downcallHandle(fPtr, functionDesc);
         });
     }
 
@@ -105,7 +128,7 @@ public class NativeMapper {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T populateStruct(T target, MemorySegment segment) throws IllegalAccessException {
+    public <T> T populateStructFieldHandles(T target, MemorySegment segment) throws IllegalAccessException {
         var handlers = (ObjectHandlers<T>) objectHandlers.get(target.getClass());
         for(var handler : handlers.structFieldHandlers()){
             handler.handle(this, segment, target);
@@ -114,7 +137,7 @@ public class NativeMapper {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T populateFunctions(T target) throws IllegalAccessException {
+    public <T> T populateFunctionHandles(T target) throws IllegalAccessException {
         var handlers = (ObjectHandlers<T>) objectHandlers.get(target.getClass());
         for(var handler : handlers.functionHandlers()){
             handler.handle(this, target);
@@ -123,9 +146,13 @@ public class NativeMapper {
     }
 
     public <T> T populate(T target, MemorySegment segment) throws IllegalAccessException {
-        populateStruct(target, segment);
-        populateFunctions(target);
+        populateStructFieldHandles(target, segment);
+        populateFunctionHandles(target);
         return target;
+    }
+
+    public long sizeOf(FieldDef field){
+        return field.isPointer() ? sizeOf(MemorySegment.class) : sizeOf(field.type());
     }
 
     public long sizeOf(Class<?> type){
@@ -135,7 +162,7 @@ public class NativeMapper {
     public <T> MemoryLayout layoutFor(Class<T> c){
         return layouts.computeIfAbsent(c, (t) -> {
             // Primitive types are already defined in layouts
-            return calculateLayout(defineOrGetStruct(c));
+            return calculateLayout(getOrDefineStruct(c));
         });
     }
 
@@ -188,13 +215,12 @@ public class NativeMapper {
     }
 
     public <T> NativeMapper register(Class<T> targetType){
-        var structDef = defineOrGetStruct(targetType);
+        var structDef = getOrDefineStruct(targetType);
 
         var fieldHandlers = new ArrayList<StructMappingHandler<T>>();
         var functionHandlers = new ArrayList<FunctionHandler<T>>();
         for(var field : targetType.getDeclaredFields()){
             field.setAccessible(true);
-            // TODO - handle self pointers to nested structs
             // Handle self pointers
             var selfPtr = field.getAnnotation(SelfPointer.class);
             if(selfPtr != null){
@@ -204,11 +230,17 @@ public class NativeMapper {
             var fieldHandle = field.getAnnotation(FieldHandle.class);
             if(fieldHandle != null){
                 fieldHandlers.add(new FieldHandler<>(structDef.field(fieldHandle.field()), field));
+                // Recurse to register nested struct types
+                if(!field.getType().equals(VarHandle.class) &&
+                        !field.getType().equals(MemorySegment.class) &&
+                        !isRegistered(field.getType())){
+                    register(field.getType());
+                }
             }
 
             var functionHandle = field.getAnnotation(FunctionHandle.class);
             if(functionHandle != null){
-                var builder = CFunction.create();
+                var builder = FunctionDef.create();
                 builder.withReturn(getLayout(functionHandle.returns()));
                 for(var param : functionHandle.params()){
                     builder.withParam(getLayout(param));
@@ -216,7 +248,7 @@ public class NativeMapper {
 
                 var descriptor = builder.build();
 
-                defineOrGetFunction(functionHandle.name(), descriptor);
+                getOrDefineFunction(functionHandle.name(), descriptor);
 
                 functionHandlers.add(new FunctionHandler<>(field, functionHandle.name(), descriptor));
             }
@@ -232,6 +264,10 @@ public class NativeMapper {
         }
         objectHandlers.put(targetType, handlers);
         return this;
+    }
+
+    public boolean isRegistered(Class<?> targetType){
+        return objectHandlers.containsKey(targetType);
     }
 
     public MemorySegment toCFunction(Object target, String method, MemorySession scope) throws IllegalAccessException {
