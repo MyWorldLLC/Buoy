@@ -10,7 +10,7 @@ public class TestFunctionHandles {
     public MethodHandle add;
 
     public int add(int a, int b) throws Throwable {
-        return (Integer) add.invoke(a, b);
+        return (int) add.invokeExact(a, b);
     }
 
 }
