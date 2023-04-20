@@ -1,0 +1,8 @@
+plugins {
+    id 'cpp-library'
+}
+
+// Native test library
+library {
+    linkage = [Linkage.SHARED]
+}

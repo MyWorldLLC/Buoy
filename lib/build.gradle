@@ -13,17 +13,14 @@ version = '0.0.1'
 group = 'com.myworldvw'
 
 dependencies {
-    testImplementation 'org.codehaus.groovy:groovy:3.0.13'
 
-    testImplementation 'org.spockframework:spock-core:2.2-groovy-3.0'
-    testImplementation 'junit:junit:4.13.2'
+    testImplementation "org.spockframework:spock-core:2.3-groovy-3.0"
 
 }
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(19)
-
     }
 }
 
@@ -31,11 +28,16 @@ tasks.withType(JavaCompile).configureEach {
     options.compilerArgs.add('--enable-preview')
 }
 
-
-tasks.named('test') {
-    useJUnitPlatform()
+compileTestGroovy {
+    options.compilerArgs.add('--enable-preview')
 }
 
+test {
+    useJUnitPlatform()
+    // TODO - support non-Linux lib names
+    systemProperty "buoy.test.lib.path", new File(parent.projectDir.absoluteFile, "native/build/lib/main/debug/libnative.so").toPath().toString()
+    jvmArgs(['--enable-preview'])
+}
 
 publishing {
     publications {
