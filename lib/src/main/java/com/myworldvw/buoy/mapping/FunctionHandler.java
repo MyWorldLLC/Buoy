@@ -23,7 +23,7 @@ public class FunctionHandler<T> implements FunctionMappingHandler<T> {
     @Override
     public void fill(NativeMapper mapper, T target) throws IllegalAccessException {
         if(handle == null){
-            handle = mapper.defineOrGetFunction(name, descriptor);
+            handle = mapper.getOrDefineFunction(name, descriptor);
         }
 
         field.set(target, handle);

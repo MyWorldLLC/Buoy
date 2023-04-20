@@ -5,7 +5,7 @@ import java.lang.foreign.MemoryLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CFunction {
+public class FunctionDef {
 
     public static Builder create(){
         return new Builder();

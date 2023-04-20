@@ -1,4 +1,4 @@
-package com.myworldvw.buoy.mapping;
+package com.myworldvw.buoy;
 
 public record FieldDef(int index, String name, Class<?> type, boolean isPointer) {
 

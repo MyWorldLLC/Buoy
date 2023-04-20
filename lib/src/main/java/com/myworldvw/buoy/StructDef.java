@@ -1,4 +1,4 @@
-package com.myworldvw.buoy.mapping;
+package com.myworldvw.buoy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
