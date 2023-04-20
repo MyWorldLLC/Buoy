@@ -2,6 +2,7 @@ package com.myworldvw.buoy;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
+import java.nio.file.Path;
 
 public class Platform {
 
@@ -16,6 +17,16 @@ public class Platform {
 
     public static MemorySegment toCFunction(MethodHandle method, FunctionDescriptor descriptor, MemorySession scope){
         return Linker.nativeLinker().upcallStub(method, descriptor, scope);
+    }
+
+    public static SymbolLookup loadLibrary(String libName, MemorySession scope){
+        System.loadLibrary(libName);
+        return SymbolLookup.libraryLookup(libName, scope);
+    }
+
+    public static SymbolLookup loadLibrary(Path libPath, MemorySession scope){
+        System.load(libPath.toString());
+        return SymbolLookup.libraryLookup(libPath, scope);
     }
 
     public static OperatingSystemFamily detectOS(){

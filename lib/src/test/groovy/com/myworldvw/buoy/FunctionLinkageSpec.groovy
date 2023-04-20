@@ -5,18 +5,23 @@ import spock.lang.Specification
 
 class FunctionLinkageSpec extends Specification {
 
-    def mapper = new NativeMapper()
-    def model = TestUtil.create()
-
-    def "should add integers correctly"(){
+    def "should map function handles correctly"(){
 
         when:
-        def functions = TestUtil.makeFunctionHandles()
-        functions.addFn != null
-        functions.addFn.invoke(1, 2) == 3
+        TestUtil.makeFunctionHandles()
 
         then:
         noExceptionThrown()
+    }
+
+    def "should map add integers correctly"(){
+
+        when:
+        def functions = TestUtil.makeFunctionHandles()
+
+        then:
+        functions.add != null
+        functions.add(1, 2) == 3
     }
 
 }

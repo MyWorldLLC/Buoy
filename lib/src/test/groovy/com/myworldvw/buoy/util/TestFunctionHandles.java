@@ -7,6 +7,10 @@ import java.lang.invoke.MethodHandle;
 public class TestFunctionHandles {
 
     @FunctionHandle(name = "add", returns = int.class, params = {int.class, int.class})
-    public MethodHandle addFn;
+    public MethodHandle add;
+
+    public int add(int a, int b) throws Throwable {
+        return (Integer) add.invoke(a, b);
+    }
 
 }

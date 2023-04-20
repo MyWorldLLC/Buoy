@@ -35,14 +35,14 @@ public class NativeMapper {
         structs = new HashMap<>();
 
         layouts = new HashMap<>();
-        layouts.put(Byte.class, ValueLayout.JAVA_BYTE);
-        layouts.put(Boolean.class, ValueLayout.JAVA_BOOLEAN);
-        layouts.put(Character.class, ValueLayout.JAVA_CHAR);
-        layouts.put(Double.class, ValueLayout.JAVA_DOUBLE);
-        layouts.put(Float.class, ValueLayout.JAVA_FLOAT);
-        layouts.put(Integer.class, ValueLayout.JAVA_INT);
-        layouts.put(Long.class, ValueLayout.JAVA_LONG);
-        layouts.put(Short.class, ValueLayout.JAVA_SHORT);
+        layouts.put(byte.class, ValueLayout.JAVA_BYTE);
+        layouts.put(boolean.class, ValueLayout.JAVA_BOOLEAN);
+        layouts.put(char.class, ValueLayout.JAVA_CHAR);
+        layouts.put(double.class, ValueLayout.JAVA_DOUBLE);
+        layouts.put(float.class, ValueLayout.JAVA_FLOAT);
+        layouts.put(int.class, ValueLayout.JAVA_INT);
+        layouts.put(long.class, ValueLayout.JAVA_LONG);
+        layouts.put(short.class, ValueLayout.JAVA_SHORT);
         layouts.put(MemorySegment.class, ValueLayout.ADDRESS);
 
         cachedFunctionHandles = new HashMap<>();
@@ -63,6 +63,10 @@ public class NativeMapper {
             throw new IllegalArgumentException("Class %s is not annotated with @CStruct".formatted(type.getName()));
         }
         return annotation;
+    }
+
+    public boolean isStructType(Class<?> type){
+        return type.getAnnotation(CStruct.class) != null;
     }
 
     public String getStructName(Class<?> type){
@@ -215,7 +219,10 @@ public class NativeMapper {
     }
 
     public <T> NativeMapper register(Class<T> targetType){
-        var structDef = getOrDefineStruct(targetType);
+        StructDef structDef = null;
+        if(isStructType(targetType)){
+            structDef = getOrDefineStruct(targetType);
+        }
 
         var fieldHandlers = new ArrayList<StructMappingHandler<T>>();
         var functionHandlers = new ArrayList<FunctionHandler<T>>();
@@ -224,11 +231,17 @@ public class NativeMapper {
             // Handle self pointers
             var selfPtr = field.getAnnotation(SelfPointer.class);
             if(selfPtr != null){
+                if(structDef == null){
+                    throw new IllegalArgumentException("Cannot use @SelfPointer on a non-struct class: " + targetType.getName());
+                }
                 fieldHandlers.add(new SelfPointerHandler<>(field));
             }
 
             var fieldHandle = field.getAnnotation(FieldHandle.class);
             if(fieldHandle != null){
+                if(structDef == null){
+                    throw new IllegalArgumentException("Cannot use @FieldHandle on a non-struct class: " + targetType.getName());
+                }
                 fieldHandlers.add(new FieldHandler<>(structDef.field(fieldHandle.field()), field));
                 // Recurse to register nested struct types
                 if(!field.getType().equals(VarHandle.class) &&
