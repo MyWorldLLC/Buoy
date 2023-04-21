@@ -29,6 +29,10 @@ public class Platform {
         return SymbolLookup.libraryLookup(libPath, scope);
     }
 
+    public static MemorySegment allocateStruct(MemoryLayout layout, MemorySession scope){
+        return scope.allocate(layout.byteSize(), layout.byteAlignment());
+    }
+
     public static OperatingSystemFamily detectOS(){
         var os = System.getProperty("os.name").toLowerCase();
 

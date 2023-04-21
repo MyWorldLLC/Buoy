@@ -18,6 +18,12 @@ public class TestUtil {
         return mapper.populateFunctionHandles(new TestFunctionHandles());
     }
 
+    public static NumbersT makeNumbersT() throws IllegalAccessException {
+        var mapper = new NativeMapper(testLib);
+        mapper.register(NumbersT.class);
+        return mapper.populate(new NumbersT(), Platform.allocateStruct(mapper.getLayout(NumbersT.class), MemorySession.global()));
+    }
+
     public static Object create(){
         return null;
     }

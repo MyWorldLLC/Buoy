@@ -178,7 +178,7 @@ public class NativeMapper {
 
         for(int i = 0; i < def.fields().length; i++){
             var field = def.fields()[i];
-            var layout = getLayout(field.type());
+            var layout = getLayout(field.type()).withName(field.name());
 
             // Track largest element so that we can set
             // end padding of the struct accordingly
