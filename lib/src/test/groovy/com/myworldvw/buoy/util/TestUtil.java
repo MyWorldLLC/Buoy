@@ -9,7 +9,7 @@ import java.nio.file.Path;
 
 public class TestUtil {
 
-    public static final SymbolLookup testLib = Platform.loadLibrary(Path.of(System.getProperty("buoy.test.lib.path") + Platform.standardLibraryName("native")), MemorySession.global());
+    public static final SymbolLookup testLib = Platform.loadLibrary(Path.of(System.getProperty("buoy.test.lib.path") + "/" + Platform.standardLibraryName("native")), MemorySession.global());
 
 
     public static TestFunctionHandles makeFunctionHandles() throws IllegalAccessException {

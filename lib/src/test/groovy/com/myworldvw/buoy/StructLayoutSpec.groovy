@@ -8,7 +8,7 @@ class StructLayoutSpec extends Specification {
     def "should correctly map struct fields"(){
         when:
         def numbers = TestUtil.makeNumbersT()
-        numbers.set(1, (short)2)
+        numbers.set((short)1, 2)
 
         then:
         numbers.addShort() == 3
