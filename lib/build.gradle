@@ -35,7 +35,7 @@ compileTestGroovy {
 test {
     useJUnitPlatform()
     // TODO - support non-Linux lib names
-    systemProperty "buoy.test.lib.path", new File(parent.projectDir.absoluteFile, "native/build/lib/main/debug/libnative.so").toPath().toString()
+    systemProperty "buoy.test.lib.path", new File(parent.projectDir.absoluteFile, "native/build/lib/main/debug/").toPath().toString()
     jvmArgs(['--enable-preview'])
 }
 

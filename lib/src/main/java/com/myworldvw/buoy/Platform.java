@@ -19,6 +19,15 @@ public class Platform {
         return Linker.nativeLinker().upcallStub(method, descriptor, scope);
     }
 
+    public static String standardLibraryName(String name){
+        return switch (detectOS()){
+            case LINUX -> "lib" + name + ".so";
+            case MAC_OSX -> "lib" + name + ".dylib";
+            case WINDOWS -> name + ".dll";
+            default -> name;
+        };
+    }
+
     public static SymbolLookup loadLibrary(String libName, MemorySession scope){
         System.loadLibrary(libName);
         return SymbolLookup.libraryLookup(libName, scope);
