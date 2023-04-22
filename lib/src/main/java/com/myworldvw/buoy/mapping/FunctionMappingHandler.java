@@ -2,8 +2,6 @@ package com.myworldvw.buoy.mapping;
 
 import com.myworldvw.buoy.NativeMapper;
 
-import java.lang.foreign.MemorySegment;
-
 public interface FunctionMappingHandler<T> {
 
     void fill(NativeMapper mapper, T target) throws IllegalAccessException;

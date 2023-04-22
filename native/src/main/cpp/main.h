@@ -10,4 +10,7 @@ extern "C" {
     } numbers_t;
 
     int32_t add_numbers_t(numbers_t* n);
+
+    void set_errno(int32_t err);
+    int32_t get_errno();
 }

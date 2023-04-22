@@ -50,6 +50,10 @@ public class NativeMapper {
         architecture = Platform.detectArchitecture();
     }
 
+    public SymbolLookup getLookup(){
+        return lookup;
+    }
+
     public void defineStruct(StructDef model){
         if(structs.containsKey(model.name())){
             throw new IllegalStateException("Struct %s is already defined".formatted(model.name()));
@@ -149,9 +153,19 @@ public class NativeMapper {
         return target;
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> T populateGlobals(T target) throws IllegalAccessException {
+        var handlers = (ObjectHandlers<T>) objectHandlers.get(target.getClass());
+        for(var handler : handlers.globalHandlers()){
+            handler.handle(this, null, target);
+        }
+        return target;
+    }
+
     public <T> T populate(T target, MemorySegment segment) throws IllegalAccessException {
         populateStructFieldHandles(target, segment);
         populateFunctionHandles(target);
+        populateGlobals(target);
         return target;
     }
 
@@ -160,6 +174,9 @@ public class NativeMapper {
     }
 
     public long sizeOf(Class<?> type){
+        if(type.equals(void.class)){
+            return 0;
+        }
         return layoutFor(type).bitSize();
     }
 
@@ -226,6 +243,7 @@ public class NativeMapper {
 
         var fieldHandlers = new ArrayList<StructMappingHandler<T>>();
         var functionHandlers = new ArrayList<FunctionHandler<T>>();
+        var globalHandlers = new ArrayList<GlobalHandler<T>>();
         for(var field : targetType.getDeclaredFields()){
             field.setAccessible(true);
             // Handle self pointers
@@ -254,7 +272,10 @@ public class NativeMapper {
             var functionHandle = field.getAnnotation(FunctionHandle.class);
             if(functionHandle != null){
                 var builder = FunctionDef.create();
-                builder.withReturn(getLayout(functionHandle.returns()));
+                if(!functionHandle.returns().equals(void.class)){
+                    builder.withReturn(getLayout(functionHandle.returns()));
+                }
+
                 for(var param : functionHandle.params()){
                     builder.withParam(getLayout(param));
                 }
@@ -265,9 +286,14 @@ public class NativeMapper {
 
                 functionHandlers.add(new FunctionHandler<>(field, functionHandle.name(), descriptor));
             }
+
+            var globalHandle = field.getAnnotation(GlobalHandle.class);
+            if(globalHandle != null){
+                globalHandlers.add(new GlobalHandler<>(field, globalHandle.name(), globalHandle.type(), globalHandle.pointer()));
+            }
         }
 
-        var handlers = new ObjectHandlers<>(targetType, fieldHandlers, functionHandlers);
+        var handlers = new ObjectHandlers<>(targetType, fieldHandlers, functionHandlers, globalHandlers);
         return register(targetType, handlers);
     }
 
