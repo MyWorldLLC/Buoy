@@ -11,14 +11,14 @@ public class Globals {
     @GlobalHandle(name = "errno", type = int.class)
     public MemorySegment errno;
 
-    @FunctionHandle(name = "set_errno", params = {int.class})
-    public MethodHandle setErrno;
+    @FunctionHandle(name = "set_and_get_errno", returns = int.class, params = {int.class})
+    public MethodHandle setAndGetErrno;
 
     @FunctionHandle(name = "get_errno", returns = int.class)
     public MethodHandle getErrno;
 
-    public void setErrno(int errno) throws Throwable {
-        setErrno.invokeExact(errno);
+    public int setAndGetErrno(int errno) throws Throwable {
+        return (int) setAndGetErrno.invokeExact(errno);
     }
 
     public int getErrno() throws Throwable {

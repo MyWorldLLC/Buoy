@@ -14,7 +14,9 @@ class GlobalLinkageSpec extends Specification {
 
         then:
         globals.@errno.address() != MemoryAddress.NULL
+        globals.@errno.set(ValueLayout.JAVA_INT, 0, 0xFFEB)
         globals.@errno.get(ValueLayout.JAVA_INT, 0) == globals.getErrno()
+        globals.getErrno() == 0xFFEB
     }
 
 }
