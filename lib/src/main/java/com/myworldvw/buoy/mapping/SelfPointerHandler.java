@@ -15,6 +15,8 @@ public class SelfPointerHandler<T> implements StructMappingHandler<T> {
 
     @Override
     public void fill(NativeMapper mapper, MemorySegment segment, T target) throws IllegalAccessException {
-        field.set(target, segment);
+        if(!Util.skipField(field, target)){
+            field.set(target, segment);
+        }
     }
 }

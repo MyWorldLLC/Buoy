@@ -2,9 +2,9 @@ package com.myworldvw.buoy.mapping;
 
 import com.myworldvw.buoy.NativeMapper;
 
-import java.lang.foreign.MemoryAddress;
 import java.lang.foreign.MemorySegment;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 public class GlobalHandler<T> implements StructMappingHandler<T> {
 
@@ -28,6 +28,9 @@ public class GlobalHandler<T> implements StructMappingHandler<T> {
 
     @Override
     public void fill(NativeMapper mapper, MemorySegment segment, T target) throws IllegalAccessException {
+        if(Util.skipField(field, target)){
+            return;
+        }
 
         if(symbolPtr == null){
             symbolPtr = mapper.getLookup().lookup(name)
@@ -41,6 +44,5 @@ public class GlobalHandler<T> implements StructMappingHandler<T> {
         }
 
         field.set(target, symbolPtr);
-
     }
 }

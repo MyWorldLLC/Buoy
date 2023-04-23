@@ -22,6 +22,11 @@ public class FunctionHandler<T> implements FunctionMappingHandler<T> {
 
     @Override
     public void fill(NativeMapper mapper, T target) throws IllegalAccessException {
+
+        if(Util.skipField(field, target)){
+            return;
+        }
+
         if(handle == null){
             handle = mapper.getOrDefineFunction(name, descriptor);
         }

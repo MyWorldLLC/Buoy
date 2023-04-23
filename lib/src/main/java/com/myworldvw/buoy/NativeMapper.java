@@ -136,8 +136,15 @@ public class NativeMapper {
     }
 
     @SuppressWarnings("unchecked")
+    public <T> ObjectHandlers<T> getHandlers(T target){
+        return target instanceof Class ?
+                (ObjectHandlers<T>) objectHandlers.get(target) :
+                (ObjectHandlers<T>) objectHandlers.get(target.getClass());
+    }
+
+    @SuppressWarnings("unchecked")
     public <T> T populateStructFieldHandles(T target, MemorySegment segment) throws IllegalAccessException {
-        var handlers = (ObjectHandlers<T>) objectHandlers.get(target.getClass());
+        var handlers = getHandlers(target);
         for(var handler : handlers.structFieldHandlers()){
             handler.handle(this, segment, target);
         }
@@ -146,7 +153,7 @@ public class NativeMapper {
 
     @SuppressWarnings("unchecked")
     public <T> T populateFunctionHandles(T target) throws IllegalAccessException {
-        var handlers = (ObjectHandlers<T>) objectHandlers.get(target.getClass());
+        var handlers = getHandlers(target);
         for(var handler : handlers.functionHandlers()){
             handler.handle(this, target);
         }
@@ -155,7 +162,7 @@ public class NativeMapper {
 
     @SuppressWarnings("unchecked")
     public <T> T populateGlobals(T target) throws IllegalAccessException {
-        var handlers = (ObjectHandlers<T>) objectHandlers.get(target.getClass());
+        var handlers = getHandlers(target);
         for(var handler : handlers.globalHandlers()){
             handler.handle(this, null, target);
         }
@@ -236,6 +243,10 @@ public class NativeMapper {
     }
 
     public <T> NativeMapper register(Class<T> targetType){
+        return register(targetType, false);
+    }
+
+    public <T> NativeMapper register(Class<T> targetType, boolean registerSupers){
         StructDef structDef = null;
         if(isStructType(targetType)){
             structDef = getOrDefineStruct(targetType);
@@ -294,7 +305,12 @@ public class NativeMapper {
         }
 
         var handlers = new ObjectHandlers<>(targetType, fieldHandlers, functionHandlers, globalHandlers);
-        return register(targetType, handlers);
+        register(targetType, handlers);
+
+        if(registerSupers && !targetType.getSuperclass().equals(Object.class)){
+            register(targetType.getSuperclass());
+        }
+        return this;
     }
 
     public <T> NativeMapper register(Class<T> targetType, ObjectHandlers<T> handlers){
