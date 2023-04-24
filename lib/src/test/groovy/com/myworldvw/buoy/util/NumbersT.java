@@ -10,8 +10,8 @@ import java.lang.invoke.VarHandle;
 @CStruct(
         name = "numbers_t",
         fields = {
-                @StructField(index = 0, field = "a", type = short.class),
-                @StructField(index = 1, field = "b", type = int.class)
+                @StructField(name = "a", type = short.class),
+                @StructField(name = "b", type = int.class)
         }
 )
 public class NumbersT {
@@ -19,10 +19,10 @@ public class NumbersT {
     @SelfPointer
     protected MemorySegment self;
 
-    @FieldHandle(field = "a")
+    @FieldHandle(name = "a")
     protected VarHandle a;
 
-    @FieldHandle(field = "b")
+    @FieldHandle(name = "b")
     protected VarHandle b;
 
     @FunctionHandle(name = "add_short", returns = int.class, params = {int.class, short.class})

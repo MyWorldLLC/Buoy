@@ -8,8 +8,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface StructField {
-    int index() default 0;
     Class<?> type();
     boolean pointer() default false;
-    String field() default "";
+    String name() default "";
 }

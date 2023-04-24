@@ -94,8 +94,9 @@ public class NativeMapper {
         return structs.computeIfAbsent(struct.name(), (t) -> {
 
             var builder = StructDef.create(struct.name(), struct.packed());
-            for (var field : struct.fields()) {
-                builder.with(new FieldDef(field.index(), field.field(), field.type(), field.pointer()));
+            for (int i = 0; i < struct.fields().length; i++) {
+                var field = struct.fields()[i];
+                builder.with(new FieldDef(i, field.name(), field.type(), field.pointer()));
             }
 
             return builder.build();
@@ -271,7 +272,7 @@ public class NativeMapper {
                 if(structDef == null){
                     throw new IllegalArgumentException("Cannot use @FieldHandle on a non-struct class: " + targetType.getName());
                 }
-                fieldHandlers.add(new FieldHandler<>(structDef.field(fieldHandle.field()), field));
+                fieldHandlers.add(new FieldHandler<>(structDef.field(fieldHandle.name()), field));
                 // Recurse to register nested struct types
                 if(!field.getType().equals(VarHandle.class) &&
                         !field.getType().equals(MemorySegment.class) &&
