@@ -38,7 +38,7 @@ public class Platform {
         return SymbolLookup.libraryLookup(libPath, scope);
     }
 
-    public static MemorySegment allocateStruct(MemoryLayout layout, MemorySession scope){
+    public static MemorySegment allocate(MemoryLayout layout, MemorySession scope){
         return scope.allocate(layout.byteSize(), layout.byteAlignment());
     }
 

@@ -15,4 +15,17 @@ class StructLayoutSpec extends Specification {
         numbers.addNumbersT() == 3;
     }
 
+    def "should correctly nest inline and struct pointers and map to models"(){
+        when:
+        def outer = TestUtil.makeOuterT()
+
+        then:
+        outer.outerA == (byte)123
+        outer.nested.innerA == (byte)45
+        outer.nested.innerB == 67
+        outer.nestedPtr.innerA == (byte)89
+        outer.nestedPtr.innerB == 10
+
+    }
+
 }

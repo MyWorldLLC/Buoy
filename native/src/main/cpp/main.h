@@ -33,6 +33,5 @@ extern "C" {
     EXPORT int32_t set_and_get_error(int32_t err);
     EXPORT int32_t get_error();
 
-    EXPORT numbers_t make_numbers_t_value();
     EXPORT outer_t make_outer_t_value(inner_t* nested);
 }

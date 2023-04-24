@@ -104,14 +104,17 @@ public class NativeMapper {
     }
 
     public MemoryLayout getLayout(Class<?> targetType){
-        return layouts.computeIfAbsent(targetType, (t) -> {
+        var layout = layouts.get(targetType);
+        if(layout == null){
             var structAnnotation = getStructAnnotation(targetType);
             var structDef = structs.get(structAnnotation.name());
             if(structDef == null){
                 throw new IllegalStateException("No struct definition found for class " + targetType.getName());
             }
-            return calculateLayout(structDef);
-        });
+            layout = calculateLayout(structDef);
+            layouts.put(targetType, layout);
+        }
+        return layout;
     }
 
     public MethodHandle getOrDefineFunction(String name, FunctionDescriptor functionDesc){
@@ -177,6 +180,11 @@ public class NativeMapper {
         return target;
     }
 
+    public NativeMapper populateStatic(Class<?> target) throws IllegalAccessException {
+        populate(target, null);
+        return this;
+    }
+
     public long sizeOf(FieldDef field){
         return field.isPointer() ? sizeOf(MemorySegment.class) : sizeOf(field.type());
     }
@@ -186,6 +194,10 @@ public class NativeMapper {
             return 0;
         }
         return layoutFor(type).bitSize();
+    }
+
+    public MemorySegment allocate(Class<?> type, MemorySession scope){
+        return Platform.allocate(getLayout(type), scope);
     }
 
     public <T> MemoryLayout layoutFor(Class<T> c){

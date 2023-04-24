@@ -3,7 +3,6 @@ package com.myworldvw.buoy.util;
 import com.myworldvw.buoy.NativeMapper;
 import com.myworldvw.buoy.Platform;
 
-import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySession;
 import java.lang.foreign.SymbolLookup;
 import java.nio.file.Path;
@@ -22,13 +21,13 @@ public class TestUtil {
     public static NumbersT makeNumbersT() throws IllegalAccessException {
         var mapper = new NativeMapper(testLib);
         mapper.register(NumbersT.class);
-        return mapper.populate(new NumbersT(), Platform.allocateStruct(mapper.getLayout(NumbersT.class), MemorySession.global()));
+        return mapper.populate(new NumbersT(), Platform.allocate(mapper.getLayout(NumbersT.class), MemorySession.global()));
     }
 
     public static Globals makeGlobals() throws IllegalAccessException {
         var mapper = new NativeMapper(testLib);
         mapper.register(Globals.class);
-        mapper.populate(Globals.class, null);
+        mapper.populateStatic(Globals.class);
         return mapper.populate(new Globals(), null);
     }
 
@@ -41,11 +40,16 @@ public class TestUtil {
     public static void fillStatics() throws IllegalAccessException {
         var mapper = new NativeMapper(testLib);
         mapper.register(Statics.class);
-        mapper.populate(Statics.class, null);
+        mapper.populateStatic(Statics.class);
     }
 
-    public static Object create(){
-        return null;
+    public static OuterT makeOuterT() throws Throwable {
+        var mapper = new NativeMapper(testLib);
+        mapper.register(OuterT.class);
+        mapper.populateStatic(OuterT.class);
+
+        var innerPtr = mapper.allocate(InnerT.class, MemorySession.global());
+        return mapper.populate(new OuterT(), OuterT.makeOuterT(innerPtr));
     }
 
 }
