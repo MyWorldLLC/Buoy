@@ -56,8 +56,8 @@ public class FieldHandler<T> implements StructMappingHandler<T> {
         // and we populate it with the offset of the field (nested) *or* the memory address
         // contained in the field (pointer) as the object's self-pointer segment
 
-        if(Util.isStaticTarget(target)){
-            throw new IllegalArgumentException("Struct fields can only be populated for object instance fields. Illegal target: " + target);
+        if(Util.skipField(field, target)){
+            return;
         }
 
         var fieldType = field.getType();
