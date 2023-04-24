@@ -1,10 +1,15 @@
 package com.myworldvw.buoy;
 
 import java.lang.foreign.MemoryAddress;
+import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
 public class Pointer {
+
+    public static MemorySegment cast(MemorySegment p, MemoryLayout targetType){
+        return MemorySegment.ofAddress(p.address(), targetType.byteSize(), p.session());
+    }
 
     public static MemoryAddress getAddress(MemorySegment p){
         return p.get(ValueLayout.ADDRESS, 0);

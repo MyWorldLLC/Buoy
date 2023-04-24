@@ -83,7 +83,10 @@ public class FieldHandler<T> implements StructMappingHandler<T> {
                         mapper.sizeOf(model.type()),
                         structSegment.session());
             }
-            mapper.populate(field.get(target), structSegment);
+            var nestedTarget = field.get(target);
+            if(nestedTarget != null){
+                mapper.populate(nestedTarget, structSegment);
+            }
         }
 
 
