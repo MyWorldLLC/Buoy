@@ -3,6 +3,7 @@ package com.myworldvw.buoy.mapping;
 import com.myworldvw.buoy.NativeMapper;
 
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.MemorySession;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
@@ -34,13 +35,19 @@ public class GlobalHandler<T> implements StructMappingHandler<T> {
 
         if(symbolPtr == null){
             symbolPtr = mapper.getLookup().lookup(name)
+                    .map(symbol -> MemorySegment.ofAddress(
+                            symbol.address(),
+                            pointer ? mapper.sizeOf(MemorySegment.class) : mapper.sizeOf(type),
+                            segment != null ? segment.session() : MemorySession.openShared()
+                    ))
                     .orElseThrow(() -> new IllegalArgumentException("Symbol " + name + " not found"));
+
             // re-interpret the 0-length MemorySegment returned by symbol lookup as a segment with a length
             // matching the target type.
-           symbolPtr =  MemorySegment.ofAddress(
-                   symbolPtr.address(),
-                   pointer ? mapper.sizeOf(MemorySegment.class) : mapper.sizeOf(type),
-                   symbolPtr.session());
+           //symbolPtr =  MemorySegment.ofAddress(
+           //        symbolPtr.address(),
+            //       pointer ? mapper.sizeOf(MemorySegment.class) : mapper.sizeOf(type),
+           //        symbolPtr.session());
         }
 
         field.set(target, symbolPtr);

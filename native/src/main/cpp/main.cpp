@@ -15,12 +15,16 @@ int32_t add_numbers_t(numbers_t* n){
 }
 
 int32_t set_and_get_error(int32_t err){
-    error = err;
-    return error;
+    test_error = err;
+    return test_error;
 }
 
 int32_t get_error(){
-    return error;
+    return test_error;
+}
+
+int32_t* get_error_address(){
+    return &test_error;
 }
 
 outer_t make_outer_t_value(inner_t* nested){

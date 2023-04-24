@@ -44,6 +44,7 @@ public class NativeMapper {
         layouts.put(long.class, ValueLayout.JAVA_LONG);
         layouts.put(short.class, ValueLayout.JAVA_SHORT);
         layouts.put(MemorySegment.class, ValueLayout.ADDRESS);
+        layouts.put(MemoryAddress.class, ValueLayout.ADDRESS);
 
         cachedFunctionHandles = new HashMap<>();
 
@@ -139,6 +140,20 @@ public class NativeMapper {
         return handle;
     }
 
+    public MemorySegment getGlobalSymbol(String name, Class<?> type){
+        return getGlobalSymbol(name, type, null);
+    }
+
+    public MemorySegment getGlobalSymbol(String name, Class<?> type, MemorySession scope){
+        return lookup.lookup(name)
+                .map(symbol -> MemorySegment.ofAddress(
+                        symbol.address(),
+                        sizeOf(type),
+                        scope != null ? scope : MemorySession.openShared()
+                ))
+                .orElseThrow(() -> new IllegalArgumentException("Symbol " + name + " not found"));
+    }
+
     @SuppressWarnings("unchecked")
     public <T> ObjectHandlers<T> getHandlers(T target){
         return target instanceof Class ?
@@ -193,7 +208,7 @@ public class NativeMapper {
         if(type.equals(void.class)){
             return 0;
         }
-        return layoutFor(type).bitSize();
+        return layoutFor(type).byteSize();
     }
 
     public MemorySegment allocate(Class<?> type, MemorySession scope){

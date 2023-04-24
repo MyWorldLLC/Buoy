@@ -2,12 +2,12 @@
 
 #ifdef _WIN32
 #    define EXPORT __declspec(dllexport)
-#elif
+#else
 #    define EXPORT
 #endif
 
 extern "C" {
-    EXPORT int32_t error;
+    EXPORT int32_t test_error;
 
     EXPORT int32_t add(int32_t a, int32_t b);
     EXPORT int32_t add_short(int32_t a, int16_t b);
@@ -32,6 +32,7 @@ extern "C" {
 
     EXPORT int32_t set_and_get_error(int32_t err);
     EXPORT int32_t get_error();
+    EXPORT int32_t* get_error_address();
 
     EXPORT outer_t make_outer_t_value(inner_t* nested);
 }
