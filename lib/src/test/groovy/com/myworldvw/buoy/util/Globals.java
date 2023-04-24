@@ -8,21 +8,21 @@ import java.lang.invoke.MethodHandle;
 
 public class Globals {
 
-    @GlobalHandle(name = "errno", type = int.class)
-    public MemorySegment errno;
+    @GlobalHandle(name = "error", type = int.class)
+    public static MemorySegment error;
 
-    @FunctionHandle(name = "set_and_get_errno", returns = int.class, params = {int.class})
-    public MethodHandle setAndGetErrno;
+    @FunctionHandle(name = "set_and_get_error", returns = int.class, params = {int.class})
+    public MethodHandle setAndGetError;
 
-    @FunctionHandle(name = "get_errno", returns = int.class)
-    public MethodHandle getErrno;
+    @FunctionHandle(name = "get_error", returns = int.class)
+    public MethodHandle getError;
 
-    public int setAndGetErrno(int errno) throws Throwable {
-        return (int) setAndGetErrno.invokeExact(errno);
+    public int setAndGetError(int errno) throws Throwable {
+        return (int) setAndGetError.invokeExact(errno);
     }
 
-    public int getErrno() throws Throwable {
-        return (int) getErrno.invokeExact();
+    public int getError() throws Throwable {
+        return (int) getError.invokeExact();
     }
 
 }

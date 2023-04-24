@@ -3,6 +3,7 @@ package com.myworldvw.buoy.util;
 import com.myworldvw.buoy.NativeMapper;
 import com.myworldvw.buoy.Platform;
 
+import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySession;
 import java.lang.foreign.SymbolLookup;
 import java.nio.file.Path;
@@ -27,6 +28,7 @@ public class TestUtil {
     public static Globals makeGlobals() throws IllegalAccessException {
         var mapper = new NativeMapper(testLib);
         mapper.register(Globals.class);
+        mapper.populate(Globals.class, null);
         return mapper.populate(new Globals(), null);
     }
 

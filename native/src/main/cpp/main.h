@@ -1,19 +1,24 @@
 #include <cstdint>
-#include <errno.h>
+
+#ifdef _WIN32
+#    define EXPORT __declspec(dllexport)
+#elif
+#    define EXPORT
+#endif
 
 extern "C" {
-    extern "C" int errno;
+    EXPORT int32_t error;
 
-    int32_t add(int32_t a, int32_t b);
-    int32_t add_short(int32_t a, int16_t b);
+    EXPORT int32_t add(int32_t a, int32_t b);
+    EXPORT int32_t add_short(int32_t a, int16_t b);
 
-    typedef struct {
+    EXPORT typedef struct {
         int16_t a;
         int32_t b;
     } numbers_t;
 
-    int32_t add_numbers_t(numbers_t* n);
+    EXPORT int32_t add_numbers_t(numbers_t* n);
 
-    int32_t set_and_get_errno(int32_t err);
-    int32_t get_errno();
+    EXPORT int32_t set_and_get_error(int32_t err);
+    EXPORT int32_t get_error();
 }

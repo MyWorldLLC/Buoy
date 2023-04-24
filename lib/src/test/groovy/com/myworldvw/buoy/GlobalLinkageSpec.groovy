@@ -1,5 +1,6 @@
 package com.myworldvw.buoy
 
+import com.myworldvw.buoy.util.Globals
 import com.myworldvw.buoy.util.TestUtil
 import spock.lang.Specification
 
@@ -13,10 +14,10 @@ class GlobalLinkageSpec extends Specification {
         def globals = TestUtil.makeGlobals()
 
         then:
-        globals.@errno.address() != MemoryAddress.NULL
-        globals.@errno.set(ValueLayout.JAVA_INT, 0, 0xFFEB)
-        globals.@errno.get(ValueLayout.JAVA_INT, 0) == globals.getErrno()
-        globals.getErrno() == 0xFFEB
+        Globals.@error.address() != MemoryAddress.NULL
+        Globals.@error.set(ValueLayout.JAVA_INT, 0, 0xFFEB)
+        Globals.@error.get(ValueLayout.JAVA_INT, 0) == globals.getError()
+        globals.getError() == 0xFFEB
     }
 
 }
