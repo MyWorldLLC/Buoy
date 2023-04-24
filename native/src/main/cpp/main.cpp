@@ -22,3 +22,20 @@ int32_t set_and_get_error(int32_t err){
 int32_t get_error(){
     return error;
 }
+
+numbers_t make_numbers_t_value(){
+    return numbers_t{123, 456};
+}
+
+outer_t make_outer_t_value(inner_t* nested){
+    nested->a = 89;
+    nested->b = 10;
+    return outer_t{
+        123,
+        inner_t{
+            45,
+            67
+        },
+        nested
+    };
+}
