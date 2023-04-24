@@ -49,7 +49,7 @@ public class TestUtil {
         mapper.populateStatic(OuterT.class);
 
         var innerPtr = mapper.allocate(InnerT.class, MemorySession.global());
-        return mapper.populate(new OuterT(), OuterT.makeOuterT(innerPtr));
+        return mapper.populate(new OuterT(), OuterT.makeOuterT(MemorySession.global(), innerPtr));
     }
 
 }

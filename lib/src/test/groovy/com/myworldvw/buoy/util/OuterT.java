@@ -3,6 +3,7 @@ package com.myworldvw.buoy.util;
 import com.myworldvw.buoy.*;
 
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.SegmentAllocator;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 
@@ -40,11 +41,10 @@ public class OuterT {
         return nestedPtr;
     }
 
-    //outer_t make_outer_t_value(inner_t* nested)
     @FunctionHandle(name = "make_outer_t_value", returns = OuterT.class, params = {MemorySegment.class})
     protected static MethodHandle makeOuterTValue;
 
-    public static MemorySegment makeOuterT(MemorySegment innerTPtr) throws Throwable {
-        return makeOuterT(innerTPtr);
+    public static MemorySegment makeOuterT(SegmentAllocator returnAllocator, MemorySegment innerTPtr) throws Throwable {
+        return (MemorySegment) makeOuterTValue.invoke(returnAllocator, innerTPtr);
     }
 }
