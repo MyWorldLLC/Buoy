@@ -45,9 +45,9 @@ int32_t* get_error_address(){
 outer_t make_outer_t_value(inner_t* nested){
     nested->a = 89;
     nested->b = 10;
-    return outer_t{
+    return {
         123,
-        inner_t{
+        {
             45,
             67
         },
