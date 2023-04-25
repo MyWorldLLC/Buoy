@@ -15,10 +15,10 @@ jobs:
           java-version: '19'
           distribution: 'oracle'
       - name: Build native test lib
-        uses: gradle/gradle-build-action
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: :native:build
       - name: Run tests
-        uses: gradle/gradle-build-action
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: test
