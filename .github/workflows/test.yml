@@ -1,0 +1,24 @@
+name: test
+
+on: push
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    matrix:
+      os: [ubuntu-20.04, macos-11, macos-12, macos-13, windows-2019, windows-2022]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '19'
+          distribution: 'oracle'
+      - name: Build native test lib
+        uses: gradle/gradle-build-action
+        with:
+          arguments: :native:build
+      - name: Run tests
+        uses: gradle/gradle-build-action
+        with:
+          arguments: test
