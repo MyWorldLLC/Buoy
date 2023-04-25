@@ -4,9 +4,7 @@ import com.myworldvw.buoy.NativeMapper;
 import com.myworldvw.buoy.Pointer;
 
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.MemorySession;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 
 public class GlobalHandler<T> implements StructMappingHandler<T> {
 

@@ -3,7 +3,6 @@ package com.myworldvw.buoy.mapping;
 import com.myworldvw.buoy.FieldDef;
 import com.myworldvw.buoy.NativeMapper;
 
-import java.lang.foreign.MemoryAddress;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
