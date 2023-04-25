@@ -83,3 +83,11 @@ as it takes time to accommodate Panama API changes, wait for Gradle
 to support the newest JDK releases, etc. Buoy's API is also undergoing
 its own evolution right now, and will not stabilize until Panama does
 (at the soonest).
+
+## Project Structure
+Buoy itself resides in [lib/](./lib), and a small, simple example native
+library that's used for testing resides in [native/](./native). The Buoy
+bindings for the native test library live 
+[here](./lib/src/test/groovy/com/myworldvw/buoy/util) and provide a fairly
+complete example of Buoy's mapping features and some of its utility features
+as well.
