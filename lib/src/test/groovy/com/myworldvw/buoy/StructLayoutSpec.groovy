@@ -1,5 +1,6 @@
 package com.myworldvw.buoy
 
+import com.myworldvw.buoy.util.InnerT
 import com.myworldvw.buoy.util.TestUtil
 import spock.lang.Specification
 

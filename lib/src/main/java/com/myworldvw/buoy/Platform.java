@@ -42,6 +42,10 @@ public class Platform {
         return scope.allocate(layout.byteSize(), layout.byteAlignment());
     }
 
+    public static long offsetOf(MemoryLayout structLayout, String field){
+        return structLayout.byteOffset(MemoryLayout.PathElement.groupElement(field));
+    }
+
     public static OperatingSystemFamily detectOS(){
         var os = System.getProperty("os.name").toLowerCase();
 

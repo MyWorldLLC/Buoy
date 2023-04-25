@@ -79,7 +79,7 @@ public class FieldHandler<T> implements StructMappingHandler<T> {
                 // If this is a pointer type, we have to construct a new segment starting at the address
                 // contained in this segment, with the length of the field type.
                 structSegment = MemorySegment.ofAddress(
-                        MemoryAddress.ofLong(structSegment.get(ValueLayout.JAVA_LONG, 0)),
+                        structSegment.get(ValueLayout.ADDRESS, 0),
                         mapper.sizeOf(model.type()),
                         structSegment.session());
             }
@@ -88,12 +88,12 @@ public class FieldHandler<T> implements StructMappingHandler<T> {
                 mapper.populate(nestedTarget, structSegment);
             }
         }
-
-
     }
 
     protected MemorySegment segmentForField(NativeMapper mapper, Object target, MemorySegment segment){
         var offset = mapper.getLayout(target.getClass()).byteOffset(MemoryLayout.PathElement.groupElement(model.name()));
-        return segment.asSlice(offset, mapper.sizeOf(model));
+        return model.isPointer()
+                ? segment.asSlice(offset, ValueLayout.ADDRESS.byteSize())
+                : segment.asSlice(offset, mapper.sizeOf(model));
     }
 }

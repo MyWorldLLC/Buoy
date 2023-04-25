@@ -2,6 +2,7 @@ package com.myworldvw.buoy.util;
 
 import com.myworldvw.buoy.*;
 
+import java.lang.foreign.Addressable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SegmentAllocator;
 import java.lang.invoke.MethodHandle;
@@ -12,7 +13,7 @@ import java.lang.invoke.VarHandle;
         fields = {
                 @StructField(name = "outer_a", type = byte.class),
                 @StructField(name = "nested", type = InnerT.class),
-                @StructField(name = "nested_ptr", type = MemorySegment.class)
+                @StructField(name = "nested_ptr", type = InnerT.class, pointer = true)
         }
 )
 public class OuterT {
@@ -24,10 +25,10 @@ public class OuterT {
     protected VarHandle outerA;
 
     @FieldHandle(name = "nested")
-    protected InnerT nested;
+    protected InnerT nested = new InnerT();
 
     @FieldHandle(name = "nested_ptr")
-    protected InnerT nestedPtr;
+    protected InnerT nestedPtr = new InnerT();
 
     public byte getOuterA(){
         return (byte) outerA.get(self);
@@ -45,6 +46,6 @@ public class OuterT {
     protected static MethodHandle makeOuterTValue;
 
     public static MemorySegment makeOuterT(SegmentAllocator returnAllocator, MemorySegment innerTPtr) throws Throwable {
-        return (MemorySegment) makeOuterTValue.invoke(returnAllocator, innerTPtr);
+        return (MemorySegment) makeOuterTValue.invokeExact(returnAllocator, (Addressable)innerTPtr);
     }
 }
