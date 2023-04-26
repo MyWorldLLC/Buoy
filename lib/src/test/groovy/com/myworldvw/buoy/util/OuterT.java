@@ -24,7 +24,7 @@ import java.lang.foreign.SegmentAllocator;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 
-@CStruct(
+@Struct(
         name = "outer_t",
         fields = {
                 @StructField(name = "outer_a", type = byte.class),

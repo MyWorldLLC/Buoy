@@ -16,7 +16,7 @@
 
 package com.myworldvw.buoy.util;
 
-import com.myworldvw.buoy.CStruct;
+import com.myworldvw.buoy.Struct;
 import com.myworldvw.buoy.FieldHandle;
 import com.myworldvw.buoy.SelfPointer;
 import com.myworldvw.buoy.StructField;
@@ -25,7 +25,7 @@ import com.myworldvw.buoy.StructField;
 import java.lang.foreign.MemorySegment;
 import java.lang.invoke.VarHandle;
 
-@CStruct(
+@Struct(
         name = "inner_t",
         fields = {
                 @StructField(name = "a", type = byte.class),

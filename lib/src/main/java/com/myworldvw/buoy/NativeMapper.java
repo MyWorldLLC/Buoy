@@ -78,8 +78,8 @@ public class NativeMapper {
         structs.put(model.name(), model);
     }
 
-    protected CStruct getStructAnnotation(Class<?> type){
-        var annotation = type.getAnnotation(CStruct.class);
+    protected Struct getStructAnnotation(Class<?> type){
+        var annotation = type.getAnnotation(Struct.class);
         if(annotation == null){
             throw new IllegalArgumentException("Class %s is not annotated with @CStruct".formatted(type.getName()));
         }
@@ -87,7 +87,7 @@ public class NativeMapper {
     }
 
     public boolean isStructType(Class<?> type){
-        return type.getAnnotation(CStruct.class) != null;
+        return type.getAnnotation(Struct.class) != null;
     }
 
     public String getStructName(Class<?> type){

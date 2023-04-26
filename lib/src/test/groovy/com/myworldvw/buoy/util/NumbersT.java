@@ -23,7 +23,7 @@ import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 
-@CStruct(
+@Struct(
         name = "numbers_t",
         fields = {
                 @StructField(name = "a", type = short.class),
