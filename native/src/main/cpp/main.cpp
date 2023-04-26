@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 #include "main.h"
+#include <cstdlib>
 
 int32_t add(int32_t a, int32_t b){
     return a + b;
@@ -51,6 +52,37 @@ outer_t make_outer_t_value(inner_t* nested){
             45,
             67
         },
+        {
+            {
+                11,
+                22
+            },
+            {
+                33,
+                44
+            },
+            {
+                55,
+                66
+            }
+        },
         nested
     };
+}
+
+inner_t* make_inner_t_array(){
+    inner_t* arr = (inner_t*) malloc(sizeof(inner_t) * 3);
+    arr[0] = {
+        11,
+        22
+    };
+    arr[1] = {
+        33,
+        44
+    };
+    arr[2] = {
+        55,
+        66
+    };
+    return arr;
 }

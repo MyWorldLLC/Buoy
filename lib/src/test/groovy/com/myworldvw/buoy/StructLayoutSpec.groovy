@@ -35,11 +35,22 @@ class StructLayoutSpec extends Specification {
     def "should correctly nest inline and struct pointers and map to models"(){
         when:
         def outer = TestUtil.makeOuterT()
+        def mapper = TestUtil.makeMapper()
+
+        def first = outer.nestedArray.get(0, new InnerT(), mapper)
+        def second = outer.nestedArray.get(1, new InnerT(), mapper)
+        def third = outer.nestedArray.get(2, new InnerT(), mapper)
 
         then:
         outer.outerA == (byte)123
         outer.nested.innerA == (byte)45
         outer.nested.innerB == 67
+        first.innerA == (byte) 11
+        first.innerB == 22
+        second.innerA == (byte) 33
+        second.innerB == 44
+        third.innerA == (byte) 55
+        third.innerB == 66
         outer.nestedPtr.innerA == (byte)89
         outer.nestedPtr.innerB == 10
 

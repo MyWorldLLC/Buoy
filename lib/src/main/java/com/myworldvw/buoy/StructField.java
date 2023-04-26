@@ -26,5 +26,6 @@ import java.lang.annotation.Target;
 public @interface StructField {
     Class<?> type();
     boolean pointer() default false;
+    long array() default 0;
     String name() default "";
 }

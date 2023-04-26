@@ -29,6 +29,7 @@ import java.lang.invoke.VarHandle;
         fields = {
                 @StructField(name = "outer_a", type = byte.class),
                 @StructField(name = "nested", type = InnerT.class),
+                @StructField(name = "nestedArray", type = InnerT.class, array = 3),
                 @StructField(name = "nested_ptr", type = InnerT.class, pointer = true)
         }
 )
@@ -43,6 +44,9 @@ public class OuterT {
     @FieldHandle(name = "nested")
     protected InnerT nested = new InnerT();
 
+    @FieldHandle(name = "nestedArray")
+    protected Array<InnerT> nestedArray;
+
     @FieldHandle(name = "nested_ptr")
     protected InnerT nestedPtr = new InnerT();
 
@@ -52,6 +56,10 @@ public class OuterT {
 
     public InnerT getNested(){
         return nested;
+    }
+
+    public Array<InnerT> getNestedArray(){
+        return nestedArray;
     }
 
     public InnerT getNestedPtr(){

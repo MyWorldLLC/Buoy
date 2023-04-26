@@ -55,7 +55,11 @@ public class Platform {
     }
 
     public static MemorySegment allocate(MemoryLayout layout, MemorySession scope){
-        return scope.allocate(layout.byteSize(), layout.byteAlignment());
+        return allocate(layout, 1, scope);
+    }
+
+    public static MemorySegment allocate(MemoryLayout layout, long count, MemorySession scope){
+        return scope.allocate(layout.byteSize() * count);
     }
 
     public static long offsetOf(MemoryLayout structLayout, String field){

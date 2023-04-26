@@ -113,11 +113,25 @@ public class NativeMapper {
             var builder = StructDef.create(struct.name(), struct.packed());
             for (int i = 0; i < struct.fields().length; i++) {
                 var field = struct.fields()[i];
-                builder.with(new FieldDef(i, field.name(), field.type(), field.pointer()));
+                builder.with(new FieldDef(i, field.name(), field.type(), field.pointer(), field.array()));
             }
 
             return builder.build();
         });
+    }
+
+    public MemoryLayout getArrayLayout(Class<?> targetType, long length){
+        var layout = getLayout(targetType);
+        return getArrayLayout(layout, length);
+    }
+
+    public MemoryLayout getArrayLayout(MemoryLayout elementLayout, long length){
+        return MemoryLayout.sequenceLayout(length, elementLayout);
+    }
+
+    public MemoryLayout getLayout(FieldDef field){
+        var layout = getLayout(field.isPointer() ? MemorySegment.class : field.type());
+        return field.isArray() ? getArrayLayout(layout, field.array()) : layout;
     }
 
     public MemoryLayout getLayout(Class<?> targetType){
@@ -231,6 +245,24 @@ public class NativeMapper {
         return Platform.allocate(getLayout(type), scope);
     }
 
+    public <T> Array<T> arrayOf(MemoryAddress array, Class<T> type, long length, MemorySession scope){
+        return arrayOf(array, type, false, length, scope);
+    }
+
+    public <T> Array<T> arrayOf(MemoryAddress array, Class<T> type, boolean isPointer, long length, MemorySession scope){
+        var segment = Array.cast(array, getLayout(type), length, scope);
+        return arrayOf(segment, type, isPointer);
+    }
+
+    public <T> Array<T> arrayOf(MemorySegment array, Class<T> type){
+        return arrayOf(array, type, false);
+    }
+
+    public <T> Array<T> arrayOf(MemorySegment array, Class<T> type, boolean isPointer){
+        return new Array<>(array, getLayout(type), type, isPointer);
+    }
+
+
     public <T> MemoryLayout layoutFor(Class<T> c){
         return layouts.computeIfAbsent(c, (t) -> {
             // Primitive types are already defined in layouts
@@ -246,7 +278,7 @@ public class NativeMapper {
 
         for(int i = 0; i < def.fields().length; i++){
             var field = def.fields()[i];
-            var layout = getLayout(field.isPointer() ? MemorySegment.class : field.type()).withName(field.name());
+            var layout = getLayout(field).withName(field.name());
 
             // Track largest element so that we can set
             // end padding of the struct accordingly

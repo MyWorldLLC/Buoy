@@ -16,13 +16,12 @@
 
 package com.myworldvw.buoy.util;
 
-import com.myworldvw.buoy.Struct;
-import com.myworldvw.buoy.FieldHandle;
-import com.myworldvw.buoy.SelfPointer;
-import com.myworldvw.buoy.StructField;
+import com.myworldvw.buoy.*;
 
 
+import java.lang.foreign.MemoryAddress;
 import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 
 @Struct(
@@ -33,6 +32,13 @@ import java.lang.invoke.VarHandle;
         }
 )
 public class InnerT {
+
+    @FunctionHandle(name = "make_inner_t_array", returns = MemoryAddress.class)
+    public static MethodHandle makeInnerTArray;
+
+    public static MemoryAddress makeInnerTArray() throws Throwable {
+        return (MemoryAddress) makeInnerTArray.invokeExact();
+    }
 
     @SelfPointer
     protected MemorySegment self;
@@ -49,5 +55,9 @@ public class InnerT {
 
     public int getInnerB(){
         return (int) b.get(self);
+    }
+
+    public void setInnerB(int value){
+        b.set(self, value);
     }
 }

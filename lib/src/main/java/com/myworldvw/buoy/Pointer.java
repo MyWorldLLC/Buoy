@@ -16,15 +16,16 @@
 
 package com.myworldvw.buoy;
 
-import java.lang.foreign.MemoryAddress;
-import java.lang.foreign.MemoryLayout;
-import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
+import java.lang.foreign.*;
 
 public class Pointer {
 
     public static MemorySegment cast(MemorySegment p, MemoryLayout targetType){
         return MemorySegment.ofAddress(p.address(), targetType.byteSize(), p.session());
+    }
+
+    public static MemorySegment cast(Addressable p, MemoryLayout targetType, MemorySession scope){
+        return MemorySegment.ofAddress(p.address(), targetType.byteSize(), scope);
     }
 
     public static MemoryAddress getAddress(MemorySegment p){
@@ -71,7 +72,7 @@ public class Pointer {
         return p.get(ValueLayout.JAVA_FLOAT, 0);
     }
 
-    public static void setFloat(MemorySegment p, Float f){
+    public static void setFloat(MemorySegment p, float f){
         p.set(ValueLayout.JAVA_FLOAT, 0, f);
     }
 

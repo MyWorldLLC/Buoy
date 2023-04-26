@@ -16,10 +16,19 @@
 
 package com.myworldvw.buoy;
 
-public record FieldDef(int index, String name, Class<?> type, boolean isPointer) {
+public record FieldDef(int index, String name, Class<?> type, boolean isPointer, long array) {
 
-    FieldDef(int index, String name, Class<?> type){
-        this(index, name, type, false);
+    public FieldDef{
+        if(array < 0){
+            throw new IllegalArgumentException("Array parameter must be >= 0: " + array);
+        }
     }
 
+    FieldDef(int index, String name, Class<?> type){
+        this(index, name, type, false, 0);
+    }
+
+    public boolean isArray(){
+        return array > 0;
+    }
 }

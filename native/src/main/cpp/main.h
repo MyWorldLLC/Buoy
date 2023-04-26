@@ -40,6 +40,7 @@ extern "C" {
     EXPORT typedef struct {
         int8_t outer_a;
         inner_t nested;
+        inner_t nestedArray[3];
         inner_t* nested_ptr;
     } outer_t;
 
@@ -50,4 +51,5 @@ extern "C" {
     EXPORT int32_t* get_error_address();
 
     EXPORT outer_t make_outer_t_value(inner_t* nested);
+    EXPORT inner_t* make_inner_t_array();
 }

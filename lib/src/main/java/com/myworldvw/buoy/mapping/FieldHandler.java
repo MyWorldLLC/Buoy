@@ -16,8 +16,10 @@
 
 package com.myworldvw.buoy.mapping;
 
+import com.myworldvw.buoy.Array;
 import com.myworldvw.buoy.FieldDef;
 import com.myworldvw.buoy.NativeMapper;
+import com.myworldvw.buoy.Pointer;
 
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
@@ -67,6 +69,7 @@ public class FieldHandler<T> implements StructMappingHandler<T> {
         // Given the field type:
         // If it's a VarHandle, we get a handle to the field in the struct
         // If it's a MemorySegment, we calculate the field offset and assign it
+        // If it's an Array, we bind it to the segment
         // If it's an object, we determine if it's a nested struct or a pointer to a struct,
         // and we populate it with the offset of the field (nested) *or* the memory address
         // contained in the field (pointer) as the object's self-pointer segment
@@ -83,7 +86,14 @@ public class FieldHandler<T> implements StructMappingHandler<T> {
             field.set(target, handle);
         }else if(fieldType.equals(MemorySegment.class)){
             field.set(target, segmentForField(mapper, target, segment));
-        }else{
+        }else if(fieldType.equals(Array.class)){
+            field.set(target, new Array<>(
+                    arraySegmentForField(mapper, target, segment),
+                    mapper.getLayout(model.type()),
+                    model.type(),
+                    model.isPointer()
+                    ));
+        } else{
             var structDef = mapper.getOrDefineStruct(fieldType);
             if(structDef == null){
                 throw new IllegalArgumentException("Not a mappable type for a field handle: " + fieldType);
@@ -103,6 +113,19 @@ public class FieldHandler<T> implements StructMappingHandler<T> {
                 mapper.populate(nestedTarget, structSegment);
             }
         }
+    }
+
+    protected MemorySegment arraySegmentForField(NativeMapper mapper, Object target, MemorySegment segment){
+        // 1. If model is a pointer (*type[length]), dereference to get the address of the array.
+        // 2. Create a segment appropriate to the array type * length
+        var fieldSegment = segmentForField(mapper, target, segment);
+        var address = fieldSegment.address();
+        if(model.isPointer()){
+            address = Pointer.getAddress(segment);
+        }
+
+        var elementType = mapper.getLayout(model.type());
+        return MemorySegment.ofAddress(address, elementType.byteSize() * model.array(), segment.session());
     }
 
     protected MemorySegment segmentForField(NativeMapper mapper, Object target, MemorySegment segment){

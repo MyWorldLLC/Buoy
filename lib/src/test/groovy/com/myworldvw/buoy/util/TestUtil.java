@@ -16,6 +16,7 @@
 
 package com.myworldvw.buoy.util;
 
+import com.myworldvw.buoy.Array;
 import com.myworldvw.buoy.NativeMapper;
 import com.myworldvw.buoy.Platform;
 
@@ -27,6 +28,14 @@ public class TestUtil {
 
     public static final SymbolLookup testLib = Platform.loadLibrary(Path.of(System.getProperty("buoy.test.lib.path") + "/" + Platform.standardLibraryName("native")), MemorySession.global());
 
+    public static NativeMapper makeMapper(){
+        return new NativeMapper(testLib)
+                .register(OuterT.class)
+                .register(TestFunctionHandles.class)
+                .register(Globals.class)
+                .register(NumbersT.class)
+                .register(Statics.class);
+    }
 
     public static TestFunctionHandles makeFunctionHandles() throws IllegalAccessException {
         var mapper = new NativeMapper(testLib);
@@ -66,6 +75,14 @@ public class TestUtil {
 
         var innerPtr = mapper.allocate(InnerT.class, MemorySession.global());
         return mapper.populate(new OuterT(), OuterT.makeOuterT(MemorySession.global(), innerPtr));
+    }
+
+    public static Array<InnerT> makeInnerTArray() throws Throwable {
+        var mapper = new NativeMapper(testLib);
+        mapper.register(InnerT.class);
+        mapper.populateFunctionHandles(InnerT.class);
+
+        return mapper.arrayOf(InnerT.makeInnerTArray(), InnerT.class, 3, MemorySession.global());
     }
 
 }
