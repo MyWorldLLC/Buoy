@@ -27,22 +27,22 @@ extern "C" {
     EXPORT int32_t add(int32_t a, int32_t b);
     EXPORT int32_t add_short(int32_t a, int16_t b);
 
-    EXPORT typedef struct {
+    EXPORT struct numbers_t {
         int16_t a;
         int32_t b;
-    } numbers_t;
+    };
 
-    EXPORT typedef struct {
+    EXPORT struct inner_t {
         int8_t a;
         int32_t b;
-    } inner_t;
+    };
 
-    EXPORT typedef struct {
+    EXPORT struct outer_t {
         int8_t outer_a;
         inner_t nested;
         inner_t nestedArray[3];
         inner_t* nested_ptr;
-    } outer_t;
+    };
 
     EXPORT int32_t add_numbers_t(numbers_t* n);
 
