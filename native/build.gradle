@@ -6,3 +6,15 @@ plugins {
 library {
     linkage = [Linkage.SHARED]
 }
+
+tasks.withType(CppCompile).configureEach {
+    // Define toolchain-specific compiler options
+    compilerArgs.addAll toolChain.map { toolChain ->
+        if (toolChain in [ Gcc, Clang ]) {
+            return ['-std=c++11']
+        } else if (toolChain in VisualCpp) {
+            return ['/std=c++11']
+        }
+        return []
+    }
+}
