@@ -72,17 +72,8 @@ outer_t make_outer_t_value(inner_t* nested){
 
 inner_t* make_inner_t_array(){
     inner_t* arr = (inner_t*) malloc(sizeof(inner_t) * 3);
-    arr[0] = {
-        11,
-        22
-    };
-    arr[1] = {
-        33,
-        44
-    };
-    arr[2] = {
-        55,
-        66
-    };
+    arr[0] = inner_t{ 11, 22 };
+    arr[1] = inner_t{ 33, 44 };
+    arr[2] = inner_t{ 55, 66 };
     return arr;
 }

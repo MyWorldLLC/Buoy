@@ -13,7 +13,7 @@ tasks.withType(CppCompile).configureEach {
         if (toolChain in [ Gcc, Clang ]) {
             return ['-std=c++11']
         } else if (toolChain in VisualCpp) {
-            return ['/std=c++11']
+            return ['/std:c++11']
         }
         return []
     }
