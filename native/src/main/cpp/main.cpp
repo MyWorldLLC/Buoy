@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 #include "main.h"
-#include <stdlib.h>
+#include <cstdlib>
 
 int32_t add(int32_t a, int32_t b){
     return a + b;
