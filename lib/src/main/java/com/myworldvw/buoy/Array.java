@@ -37,11 +37,11 @@ public record Array<T>(MemorySegment array, MemoryLayout typeLayout, Class<T> ca
         set(array, typeLayout, index, value);
     }
 
-    public MemoryAddress getAddress(long index){
+    public MemorySegment getAddress(long index){
         return getAddress(array, index);
     }
 
-    public void setAddress(long index, MemoryAddress a){
+    public void setAddress(long index, MemorySegment a){
         setAddress(array, index, a);
     }
 
@@ -110,10 +110,10 @@ public record Array<T>(MemorySegment array, MemoryLayout typeLayout, Class<T> ca
     }
 
     public static MemorySegment cast(MemorySegment p, MemoryLayout targetType, long length){
-        return Pointer.cast(p, MemoryLayout.sequenceLayout(length, targetType), p.session());
+        return Pointer.cast(p, MemoryLayout.sequenceLayout(length, targetType), p.scope());
     }
 
-    public static MemorySegment cast(Addressable p, MemoryLayout targetType, long length, MemorySession scope){
+    public static MemorySegment cast(MemorySegment p, MemoryLayout targetType, long length, SegmentScope scope){
         return Pointer.cast(p, MemoryLayout.sequenceLayout(length, targetType), scope);
     }
 
@@ -125,11 +125,11 @@ public record Array<T>(MemorySegment array, MemoryLayout typeLayout, Class<T> ca
         MemorySegment.copy(e, 0, p, type.byteSize() * index, type.byteSize());
     }
 
-    public static MemoryAddress getAddress(MemorySegment p, long index){
+    public static MemorySegment getAddress(MemorySegment p, long index){
         return p.get(ValueLayout.ADDRESS, ValueLayout.ADDRESS.byteSize() * index);
     }
 
-    public static void setAddress(MemorySegment p, long index, MemoryAddress a){
+    public static void setAddress(MemorySegment p, long index, MemorySegment a){
         p.set(ValueLayout.ADDRESS, ValueLayout.ADDRESS.byteSize() * index, a);
     }
 

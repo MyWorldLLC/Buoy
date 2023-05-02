@@ -14,13 +14,14 @@ group = 'com.myworldvw'
 
 dependencies {
 
-    testImplementation "org.spockframework:spock-core:2.3-groovy-3.0"
+    testImplementation "org.spockframework:spock-core:2.3-groovy-4.0"
+    testImplementation 'org.apache.groovy:groovy:4.0.11'
 
 }
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(19)
+        languageVersion = JavaLanguageVersion.of(20)
     }
 }
 

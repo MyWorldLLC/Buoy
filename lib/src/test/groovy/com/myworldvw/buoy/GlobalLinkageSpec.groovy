@@ -20,7 +20,7 @@ import com.myworldvw.buoy.util.Globals
 import com.myworldvw.buoy.util.TestUtil
 import spock.lang.Specification
 
-import java.lang.foreign.MemoryAddress
+import java.lang.foreign.MemorySegment
 import java.lang.foreign.ValueLayout
 
 class GlobalLinkageSpec extends Specification {
@@ -30,8 +30,8 @@ class GlobalLinkageSpec extends Specification {
         def globals = TestUtil.makeGlobals()
 
         then:
-        Globals.@error.address() != MemoryAddress.NULL
-        Globals.@error.address() == globals.getErrorAddress()
+        Globals.@error.address() != MemorySegment.NULL
+        Globals.@error.address() == globals.getErrorAddress().address()
     }
 
     def "should set & read global field correctly"(){

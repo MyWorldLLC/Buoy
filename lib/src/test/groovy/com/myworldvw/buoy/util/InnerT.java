@@ -18,8 +18,6 @@ package com.myworldvw.buoy.util;
 
 import com.myworldvw.buoy.*;
 
-
-import java.lang.foreign.MemoryAddress;
 import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
@@ -33,11 +31,11 @@ import java.lang.invoke.VarHandle;
 )
 public class InnerT {
 
-    @FunctionHandle(name = "make_inner_t_array", returns = MemoryAddress.class)
+    @FunctionHandle(name = "make_inner_t_array", returns = MemorySegment.class)
     public static MethodHandle makeInnerTArray;
 
-    public static MemoryAddress makeInnerTArray() throws Throwable {
-        return (MemoryAddress) makeInnerTArray.invokeExact();
+    public static MemorySegment makeInnerTArray() throws Throwable {
+        return (MemorySegment) makeInnerTArray.invokeExact();
     }
 
     @SelfPointer

@@ -20,7 +20,7 @@ import com.myworldvw.buoy.util.InnerT
 import com.myworldvw.buoy.util.TestUtil
 import spock.lang.Specification
 
-import java.lang.foreign.MemorySession
+import java.lang.foreign.SegmentScope
 import java.lang.foreign.ValueLayout
 
 class ArraySpec extends Specification {
@@ -69,7 +69,7 @@ class ArraySpec extends Specification {
 
     def "should set primitive array elements correctly"(){
         when:
-        def array = Platform.allocate(ValueLayout.JAVA_INT, 3, MemorySession.global())
+        def array = Platform.allocate(ValueLayout.JAVA_INT, 3, SegmentScope.global())
         Array.setInt(array, 0, 0xAA)
         Array.setInt(array, 1, 0xBB)
         Array.setInt(array, 2, 0xCC)

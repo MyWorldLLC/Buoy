@@ -49,7 +49,7 @@ public class GlobalHandler<T> implements StructMappingHandler<T> {
         }
 
         if(symbolPtr == null){
-            symbolPtr = mapper.getLookup().lookup(name)
+            symbolPtr = mapper.getLookup().find(name)
                     .map(symbol -> Pointer.cast(symbol, mapper.getLayout(pointer ? MemorySegment.class : type)))
                     .orElseThrow(() -> new IllegalArgumentException("Symbol " + name + " not found"));
         }

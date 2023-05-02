@@ -31,7 +31,7 @@ public class Platform {
         return b ? C_TRUE : C_FALSE;
     }
 
-    public static MemorySegment toCFunction(MethodHandle method, FunctionDescriptor descriptor, MemorySession scope){
+    public static MemorySegment toCFunction(MethodHandle method, FunctionDescriptor descriptor, SegmentScope scope){
         return Linker.nativeLinker().upcallStub(method, descriptor, scope);
     }
 
@@ -44,22 +44,42 @@ public class Platform {
         };
     }
 
-    public static SymbolLookup loadLibrary(String libName, MemorySession scope){
+    public static SymbolLookup loadLibrary(String libName, SegmentScope scope){
         System.loadLibrary(libName);
         return SymbolLookup.libraryLookup(libName, scope);
     }
 
-    public static SymbolLookup loadLibrary(Path libPath, MemorySession scope){
+    public static SymbolLookup loadLibrary(Path libPath, SegmentScope scope){
         System.load(libPath.toString());
         return SymbolLookup.libraryLookup(libPath, scope);
     }
 
-    public static MemorySegment allocate(MemoryLayout layout, MemorySession scope){
+    public static SegmentAllocator globalAllocator(){
+        return allocator(SegmentScope.global());
+    }
+
+    public static SegmentAllocator autoAllocator(){
+        return allocator(SegmentScope.auto());
+    }
+
+    public static SegmentAllocator allocator(SegmentScope scope){
+        return SegmentAllocator.nativeAllocator(scope);
+    }
+
+    public static MemorySegment allocate(MemoryLayout layout){
+        return allocate(layout, SegmentScope.global());
+    }
+
+    public static MemorySegment allocate(MemoryLayout layout, long count){
+        return allocate(layout, count, SegmentScope.global());
+    }
+
+    public static MemorySegment allocate(MemoryLayout layout, SegmentScope scope){
         return allocate(layout, 1, scope);
     }
 
-    public static MemorySegment allocate(MemoryLayout layout, long count, MemorySession scope){
-        return scope.allocate(layout.byteSize() * count);
+    public static MemorySegment allocate(MemoryLayout layout, long count, SegmentScope scope){
+        return SegmentAllocator.nativeAllocator(scope).allocate(layout.byteSize() * count);
     }
 
     public static long offsetOf(MemoryLayout structLayout, String field){
