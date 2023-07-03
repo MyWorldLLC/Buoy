@@ -15,12 +15,13 @@ group = 'com.myworldvw'
 dependencies {
 
     testImplementation "org.spockframework:spock-core:2.3-groovy-3.0"
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
 
 }
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(19)
+        languageVersion = JavaLanguageVersion.of(20)
     }
 }
 

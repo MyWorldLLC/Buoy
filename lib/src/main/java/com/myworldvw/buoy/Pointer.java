@@ -20,19 +20,25 @@ import java.lang.foreign.*;
 
 public class Pointer {
 
+    public static final long NULL = 0L;
+
     public static MemorySegment cast(MemorySegment p, MemoryLayout targetType){
-        return MemorySegment.ofAddress(p.address(), targetType.byteSize(), p.session());
+        return MemorySegment.ofAddress(p.address(), targetType.byteSize(), p.scope());
     }
 
-    public static MemorySegment cast(Addressable p, MemoryLayout targetType, MemorySession scope){
+    public static MemorySegment cast(MemorySegment p, MemoryLayout targetType, SegmentScope scope){
         return MemorySegment.ofAddress(p.address(), targetType.byteSize(), scope);
     }
 
-    public static MemoryAddress getAddress(MemorySegment p){
-        return p.get(ValueLayout.ADDRESS, 0);
+    public static long getAddress(MemorySegment p){
+        return p.get(ValueLayout.ADDRESS, 0).address();
     }
 
-    public static void setAddress(MemorySegment p, MemoryAddress a){
+    public static void setAddress(MemorySegment p, long a){
+        p.set(ValueLayout.ADDRESS, 0, MemorySegment.ofAddress(a));
+    }
+
+    public static void setAddress(MemorySegment p, MemorySegment a){
         p.set(ValueLayout.ADDRESS, 0, a);
     }
 

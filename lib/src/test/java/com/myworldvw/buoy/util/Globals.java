@@ -19,7 +19,6 @@ package com.myworldvw.buoy.util;
 import com.myworldvw.buoy.FunctionHandle;
 import com.myworldvw.buoy.GlobalHandle;
 
-import java.lang.foreign.MemoryAddress;
 import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
 
@@ -34,7 +33,7 @@ public class Globals {
     @FunctionHandle(name = "get_error", returns = int.class)
     public MethodHandle getError;
 
-    @FunctionHandle(name = "get_error_address", returns = MemoryAddress.class)
+    @FunctionHandle(name = "get_error_address", returns = MemorySegment.class)
     public MethodHandle getErrorAddress;
 
     public int setAndGetError(int error) throws Throwable {
@@ -45,8 +44,8 @@ public class Globals {
         return (int) getError.invokeExact();
     }
 
-    public MemoryAddress getErrorAddress() throws Throwable {
-        return (MemoryAddress) getErrorAddress.invokeExact();
+    public MemorySegment getErrorAddress() throws Throwable {
+        return (MemorySegment) getErrorAddress.invokeExact();
     }
 
 }

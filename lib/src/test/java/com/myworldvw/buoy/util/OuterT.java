@@ -18,7 +18,6 @@ package com.myworldvw.buoy.util;
 
 import com.myworldvw.buoy.*;
 
-import java.lang.foreign.Addressable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SegmentAllocator;
 import java.lang.invoke.MethodHandle;
@@ -70,6 +69,6 @@ public class OuterT {
     protected static MethodHandle makeOuterTValue;
 
     public static MemorySegment makeOuterT(SegmentAllocator returnAllocator, MemorySegment innerTPtr) throws Throwable {
-        return (MemorySegment) makeOuterTValue.invokeExact(returnAllocator, (Addressable)innerTPtr);
+        return (MemorySegment) makeOuterTValue.invokeExact(returnAllocator, innerTPtr);
     }
 }

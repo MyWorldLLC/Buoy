@@ -60,7 +60,6 @@ public class NativeMapper {
         layouts.put(long.class, ValueLayout.JAVA_LONG);
         layouts.put(short.class, ValueLayout.JAVA_SHORT);
         layouts.put(MemorySegment.class, ValueLayout.ADDRESS);
-        layouts.put(MemoryAddress.class, ValueLayout.ADDRESS);
 
         cachedFunctionHandles = new HashMap<>();
 
@@ -150,7 +149,7 @@ public class NativeMapper {
 
     public MethodHandle getOrDefineFunction(String name, FunctionDescriptor functionDesc){
         return cachedFunctionHandles.computeIfAbsent(name, (n) -> {
-            var fPtr = lookup.lookup(name)
+            var fPtr = lookup.find(name)
                     .orElseThrow(() -> new IllegalArgumentException("Function not found: " + name));
 
             return Linker.nativeLinker().downcallHandle(fPtr, functionDesc);
@@ -174,12 +173,12 @@ public class NativeMapper {
         return getGlobalSymbol(name, type, null);
     }
 
-    public MemorySegment getGlobalSymbol(String name, Class<?> type, MemorySession scope){
-        return lookup.lookup(name)
+    public MemorySegment getGlobalSymbol(String name, Class<?> type, SegmentScope scope){
+        return lookup.find(name)
                 .map(symbol -> MemorySegment.ofAddress(
                         symbol.address(),
                         sizeOf(type),
-                        scope != null ? scope : MemorySession.openShared()
+                        scope != null ? scope : SegmentScope.auto()
                 ))
                 .orElseThrow(() -> new IllegalArgumentException("Symbol " + name + " not found"));
     }
@@ -241,15 +240,15 @@ public class NativeMapper {
         return layoutFor(type).byteSize();
     }
 
-    public MemorySegment allocate(Class<?> type, MemorySession scope){
+    public MemorySegment allocate(Class<?> type, SegmentScope scope){
         return Platform.allocate(getLayout(type), scope);
     }
 
-    public <T> Array<T> arrayOf(MemoryAddress array, Class<T> type, long length, MemorySession scope){
+    public <T> Array<T> arrayOf(MemorySegment array, Class<T> type, long length, SegmentScope scope){
         return arrayOf(array, type, false, length, scope);
     }
 
-    public <T> Array<T> arrayOf(MemoryAddress array, Class<T> type, boolean isPointer, long length, MemorySession scope){
+    public <T> Array<T> arrayOf(MemorySegment array, Class<T> type, boolean isPointer, long length, SegmentScope scope){
         var segment = Array.cast(array, getLayout(type), length, scope);
         return arrayOf(segment, type, isPointer);
     }
@@ -401,7 +400,7 @@ public class NativeMapper {
         return objectHandlers.containsKey(targetType);
     }
 
-    public MemorySegment toCFunction(Object target, String method, MemorySession scope) throws IllegalAccessException {
+    public MemorySegment toCFunction(Object target, String method, SegmentScope scope) throws IllegalAccessException {
 
         var candidates = Arrays.stream(target.getClass().getMethods()).filter(m -> m.getName().equals(method)).toList();
         if(candidates.size() > 1){
@@ -415,7 +414,7 @@ public class NativeMapper {
         return toCFunction(target, candidates.get(0), scope);
     }
 
-    public MemorySegment toCFunction(Object target, String method, MemorySession scope, Class<?> retType, Class<?>... paramTypes) throws IllegalAccessException {
+    public MemorySegment toCFunction(Object target, String method, SegmentScope scope, Class<?> retType, Class<?>... paramTypes) throws IllegalAccessException {
 
         var candidate = Arrays.stream((target instanceof Class ? ((Class<?>) target) : target.getClass()).getMethods())
                 .filter(m -> m.getName().equals(method))
@@ -428,7 +427,7 @@ public class NativeMapper {
         return toCFunction(target, m, scope);
     }
 
-    public MemorySegment toCFunction(Object target, Method method, MemorySession scope) throws IllegalAccessException {
+    public MemorySegment toCFunction(Object target, Method method, SegmentScope scope) throws IllegalAccessException {
         var handle = MethodHandles.lookup().unreflect(method);
         if((method.getModifiers() & Modifier.STATIC) != 0){
             handle.bindTo(target);
