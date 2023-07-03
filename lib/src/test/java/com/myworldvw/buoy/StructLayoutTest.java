@@ -18,7 +18,6 @@ package com.myworldvw.buoy;
 
 import com.myworldvw.buoy.util.InnerT;
 import com.myworldvw.buoy.util.TestUtil;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,8 +30,8 @@ public class StructLayoutTest {
         var numbers = TestUtil.makeNumbersT();
         numbers.set((short)1, 2);
 
-        assertEquals(numbers.addShort(), 3);
-        assertEquals(numbers.addNumbersT(), 3);
+        assertEquals(3, numbers.addShort());
+        assertEquals(3, numbers.addNumbersT());
     }
 
     @Test
@@ -47,21 +46,21 @@ public class StructLayoutTest {
         var third = outer.getNestedArray().get(2, new InnerT(), mapper);
 
         // ====== Assertions ======
-        assertEquals(outer.getOuterA(), (byte)123);
+        assertEquals(123, outer.getOuterA());
 
-        assertEquals(outer.getNested().getInnerA(), (byte)45);
-        assertEquals(outer.getNested().getInnerB(), 67);
+        assertEquals(45, outer.getNested().getInnerA());
+        assertEquals(67, outer.getNested().getInnerB());
 
-        assertEquals(first.getInnerA(), (byte)11);
-        assertEquals(first.getInnerB(), 22);
+        assertEquals(11, first.getInnerA());
+        assertEquals(22, first.getInnerB());
 
-        assertEquals(second.getInnerA(), (byte)33);
-        assertEquals(second.getInnerB(), 44);
+        assertEquals(33, second.getInnerA());
+        assertEquals(44, second.getInnerB());
 
-        assertEquals(third.getInnerA(), (byte)55);
-        assertEquals(third.getInnerB(), 66);
+        assertEquals(55, third.getInnerA());
+        assertEquals(66, third.getInnerB());
 
-        //assertEquals(outer.getNestedPtr().getInnerA(), (byte)89);
-        assertEquals(outer.getNestedPtr().getInnerB(), 10);
+        assertEquals(89, outer.getNestedPtr().getInnerA());
+        assertEquals(10, outer.getNestedPtr().getInnerB());
     }
 }

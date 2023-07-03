@@ -33,8 +33,8 @@ public class GlobalLinkageTest {
 
         var globals = TestUtil.makeGlobals();
 
-        assertNotEquals(Globals.error, MemorySegment.NULL);
-        assertEquals(Globals.error.address(), globals.getErrorAddress().address());
+        assertNotEquals(MemorySegment.NULL, Globals.error);
+        assertEquals(globals.getErrorAddress().address(), Globals.error.address());
 
     }
 
@@ -44,8 +44,8 @@ public class GlobalLinkageTest {
         var globals = TestUtil.makeGlobals();
         Globals.error.set(ValueLayout.JAVA_INT, 0, 0xFFEB);
 
-        assertEquals(Globals.error.get(ValueLayout.JAVA_INT, 0), globals.getError());
-        assertEquals(globals.getError(), 0xFFEB);
+        assertEquals(globals.getError(), Globals.error.get(ValueLayout.JAVA_INT, 0));
+        assertEquals(0xFFEB, globals.getError());
     }
 
 }

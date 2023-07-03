@@ -38,7 +38,7 @@ public class FunctionLinkageTest {
         var functions = TestUtil.makeFunctionHandles();
 
         assertNotNull(functions.add);
-        assertEquals(functions.add(1, 2), 3);
+        assertEquals(3, functions.add(1, 2));
 
     }
 

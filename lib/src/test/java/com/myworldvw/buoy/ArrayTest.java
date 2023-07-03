@@ -41,16 +41,16 @@ public class ArrayTest {
 
 
         // ====== Assertions ======
-        assertEquals(array.length(), 3);
+        assertEquals(3, array.length());
 
-        assertEquals(first.getInnerA(), (byte) 11);
-        assertEquals(first.getInnerB(), 22);
+        assertEquals(11, first.getInnerA());
+        assertEquals(22, first.getInnerB());
 
-        assertEquals(second.getInnerA(), (byte) 33);
-        assertEquals(second.getInnerB(), 44);
+        assertEquals(33, second.getInnerA());
+        assertEquals(44, second.getInnerB());
 
-        assertEquals(third.getInnerA(), (byte) 55);
-        assertEquals(third.getInnerB(), 66);
+        assertEquals(55, third.getInnerA());
+        assertEquals(66, third.getInnerB());
     }
 
     @Test
@@ -68,14 +68,14 @@ public class ArrayTest {
         second.setInnerB(77);
 
         // ====== Assertions ======
-        assertEquals(first.getInnerA(), (byte) 11);
-        assertEquals(first.getInnerB(), 22);
+        assertEquals(11, first.getInnerA());
+        assertEquals(22, first.getInnerB());
 
-        assertEquals(second.getInnerA(), (byte) 33);
-        assertEquals(second.getInnerB(), 77);
+        assertEquals(33, second.getInnerA());
+        assertEquals(77, second.getInnerB());
 
-        assertEquals(third.getInnerA(), (byte) 55);
-        assertEquals(third.getInnerB(), 66);
+        assertEquals(55, third.getInnerA());
+        assertEquals(66, third.getInnerB());
     }
 
     @Test
@@ -88,9 +88,9 @@ public class ArrayTest {
         Array.setInt(array, 2, 0xCC);
 
         // ====== Assertions ======
-        assertEquals(Array.getInt(array, 0), 0xAA);
-        assertEquals(Array.getInt(array, 1), 0xBB);
-        assertEquals(Array.getInt(array, 2), 0xCC);
+        assertEquals(0xAA, Array.getInt(array, 0));
+        assertEquals(0xBB, Array.getInt(array, 1));
+        assertEquals(0xCC, Array.getInt(array, 2));
 
     }
 }
