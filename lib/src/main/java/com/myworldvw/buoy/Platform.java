@@ -55,6 +55,27 @@ public class Platform {
     }
 
     public static MemorySegment allocate(MemoryLayout layout, SegmentScope scope){
+    public static SegmentAllocator globalAllocator(){
+        return allocator(SegmentScope.global());
+    }
+
+    public static SegmentAllocator autoAllocator(){
+        return allocator(SegmentScope.auto());
+    }
+
+    public static SegmentAllocator allocator(SegmentScope scope){
+        return SegmentAllocator.nativeAllocator(scope);
+    }
+
+    public static MemorySegment allocate(MemoryLayout layout){
+        return allocate(layout, SegmentScope.global());
+    }
+
+    public static MemorySegment allocate(MemoryLayout layout, long count){
+        return allocate(layout, count, SegmentScope.global());
+    }
+
+    public static MemorySegment allocate(MemoryLayout layout, SegmentScope scope){
         return allocate(layout, 1, scope);
     }
 
