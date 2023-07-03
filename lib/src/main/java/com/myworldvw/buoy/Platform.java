@@ -54,7 +54,6 @@ public class Platform {
         return SymbolLookup.libraryLookup(libPath, scope);
     }
 
-    public static MemorySegment allocate(MemoryLayout layout, SegmentScope scope){
     public static SegmentAllocator globalAllocator(){
         return allocator(SegmentScope.global());
     }

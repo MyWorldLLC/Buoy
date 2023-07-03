@@ -75,8 +75,6 @@ public class TestUtil {
         mapper.populateStatic(OuterT.class);
 
         var innerPtr = mapper.allocate(InnerT.class, SegmentScope.global());
-        return mapper.populate(new OuterT(), OuterT.makeOuterT(SegmentAllocator.nativeAllocator(SegmentScope.auto()), innerPtr));
-        var innerPtr = mapper.allocate(InnerT.class, SegmentScope.global());
         return mapper.populate(new OuterT(), OuterT.makeOuterT(Platform.globalAllocator(), innerPtr));
     }
 
