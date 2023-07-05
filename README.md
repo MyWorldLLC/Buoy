@@ -11,6 +11,11 @@ small, simple, and very thin runtime wrapper over Panama's verbose
 and subtle parts to make hand-writing native bindings faster, easier,
 and less error-prone than other alternatives.
 
+Buoy fills a role virtually identical to .NET's P/Invoke and is somewhat
+similar in usage, though any API similarities are entirely coincidental
+as Buoy makes no attempt to imitate P/Invoke's API or usage patterns
+in any capacity.
+
 ## Why not hand-write Panama bindings directly?
 Issues with writing Panama code directly, from a high level perspective:
 * Verbose code, tedious and time-consuming to type.
