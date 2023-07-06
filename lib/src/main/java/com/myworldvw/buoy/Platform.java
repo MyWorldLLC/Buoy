@@ -36,21 +36,19 @@ public class Platform {
     }
 
     public static String standardLibraryName(String name){
-        return switch (detectOS()){
+        var os = detectOS();
+        return os == null ? name : switch (os){
             case LINUX -> "lib" + name + ".so";
             case MAC_OSX -> "lib" + name + ".dylib";
             case WINDOWS -> name + ".dll";
-            default -> name;
         };
     }
 
     public static SymbolLookup loadLibrary(String libName, SegmentScope scope){
-        System.loadLibrary(libName);
         return SymbolLookup.libraryLookup(libName, scope);
     }
 
     public static SymbolLookup loadLibrary(Path libPath, SegmentScope scope){
-        System.load(libPath.toString());
         return SymbolLookup.libraryLookup(libPath, scope);
     }
 
