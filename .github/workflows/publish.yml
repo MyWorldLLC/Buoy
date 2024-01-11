@@ -16,6 +16,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Build native test lib
+        run: ./gradlew build :native:build
+
       - name: Build with Gradle
         run: ./gradlew build
 
