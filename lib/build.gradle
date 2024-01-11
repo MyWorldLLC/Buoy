@@ -9,7 +9,11 @@ repositories {
     mavenCentral()
 }
 
-version = '0.0.1'
+def getGitVersion(){
+    "git describe --tags --always --first-parent".execute().text.trim()
+}
+
+version = getGitVersion()
 group = 'com.myworldvw'
 
 dependencies {
@@ -51,5 +55,13 @@ publishing {
     }
     repositories {
         mavenLocal()
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/MyWorldLLC/Packages")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
     }
 }
