@@ -20,7 +20,7 @@ import com.myworldvw.buoy.util.InnerT;
 import com.myworldvw.buoy.util.TestUtil;
 import org.junit.jupiter.api.Test;
 
-import java.lang.foreign.SegmentScope;
+import java.lang.foreign.Arena;
 import java.lang.foreign.ValueLayout;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -82,7 +82,7 @@ public class ArrayTest {
     void setPrimitiveArrayElements(){
 
         // ====== Setup ======
-        var array = Platform.allocate(ValueLayout.JAVA_INT, 3, SegmentScope.global());
+        var array = Platform.allocate(ValueLayout.JAVA_INT, 3, Arena.global());
         Array.setInt(array, 0, 0xAA);
         Array.setInt(array, 1, 0xBB);
         Array.setInt(array, 2, 0xCC);

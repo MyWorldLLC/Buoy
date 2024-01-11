@@ -17,6 +17,7 @@
 package com.myworldvw.buoy;
 
 import java.lang.foreign.*;
+import java.lang.foreign.MemorySegment.Scope;
 
 public record Array<T>(MemorySegment array, MemoryLayout typeLayout, Class<T> carrierType, boolean isPointer) {
 
@@ -114,11 +115,11 @@ public record Array<T>(MemorySegment array, MemoryLayout typeLayout, Class<T> ca
     }
 
     public static MemorySegment cast(MemorySegment p, MemoryLayout targetType, long length){
-        return Pointer.cast(p, MemoryLayout.sequenceLayout(length, targetType), p.scope());
+        return Pointer.cast(p, MemoryLayout.sequenceLayout(length, targetType));
     }
 
-    public static MemorySegment cast(MemorySegment p, MemoryLayout targetType, long length, SegmentScope scope){
-        return Pointer.cast(p, MemoryLayout.sequenceLayout(length, targetType), scope);
+    public static MemorySegment cast(MemorySegment p, MemoryLayout targetType, long length, Arena arena){
+        return Pointer.cast(p, MemoryLayout.sequenceLayout(length, targetType), arena);
     }
 
     public static MemorySegment get(MemorySegment p, MemoryLayout type, long index){

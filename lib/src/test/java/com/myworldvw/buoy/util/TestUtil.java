@@ -20,14 +20,13 @@ import com.myworldvw.buoy.Array;
 import com.myworldvw.buoy.NativeMapper;
 import com.myworldvw.buoy.Platform;
 
-import java.lang.foreign.SegmentAllocator;
-import java.lang.foreign.SegmentScope;
+import java.lang.foreign.Arena;
 import java.lang.foreign.SymbolLookup;
 import java.nio.file.Path;
 
 public class TestUtil {
 
-    public static final SymbolLookup testLib = Platform.loadLibrary(Path.of(System.getProperty("buoy.test.lib.path") + "/" + Platform.standardLibraryName("native")), SegmentScope.global());
+    public static final SymbolLookup testLib = Platform.loadLibrary(Path.of(System.getProperty("buoy.test.lib.path") + "/" + Platform.standardLibraryName("native")), Arena.global());
 
     public static NativeMapper makeMapper(){
         return new NativeMapper(testLib)
@@ -47,7 +46,7 @@ public class TestUtil {
     public static NumbersT makeNumbersT() throws IllegalAccessException {
         var mapper = new NativeMapper(testLib);
         mapper.register(NumbersT.class);
-        return mapper.populate(new NumbersT(), Platform.allocate(mapper.getLayout(NumbersT.class), SegmentScope.global()));
+        return mapper.populate(new NumbersT(), Platform.allocate(mapper.getLayout(NumbersT.class), Arena.global()));
     }
 
     public static Globals makeGlobals() throws IllegalAccessException {
@@ -74,8 +73,8 @@ public class TestUtil {
         mapper.register(OuterT.class);
         mapper.populateStatic(OuterT.class);
 
-        var innerPtr = mapper.allocate(InnerT.class, SegmentScope.global());
-        return mapper.populate(new OuterT(), OuterT.makeOuterT(Platform.globalAllocator(), innerPtr));
+        var innerPtr = mapper.allocate(InnerT.class, Arena.global());
+        return mapper.populate(new OuterT(), OuterT.makeOuterT(Platform.globalArena(), innerPtr));
     }
 
     public static Array<InnerT> makeInnerTArray() throws Throwable {
@@ -83,7 +82,7 @@ public class TestUtil {
         mapper.register(InnerT.class);
         mapper.populateFunctionHandles(InnerT.class);
 
-        return mapper.arrayOf(InnerT.makeInnerTArray(), InnerT.class, 3, SegmentScope.global());
+        return mapper.arrayOf(InnerT.makeInnerTArray(), InnerT.class, 3, Arena.global());
     }
 
 }

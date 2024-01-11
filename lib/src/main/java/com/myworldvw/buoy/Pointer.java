@@ -17,17 +17,18 @@
 package com.myworldvw.buoy;
 
 import java.lang.foreign.*;
+import java.lang.foreign.MemorySegment.Scope;
 
 public class Pointer {
 
     public static final long NULL = 0L;
 
     public static MemorySegment cast(MemorySegment p, MemoryLayout targetType){
-        return MemorySegment.ofAddress(p.address(), targetType.byteSize(), p.scope());
+        return p.reinterpret(targetType.byteSize());
     }
 
-    public static MemorySegment cast(MemorySegment p, MemoryLayout targetType, SegmentScope scope){
-        return MemorySegment.ofAddress(p.address(), targetType.byteSize(), scope);
+    public static MemorySegment cast(MemorySegment p, MemoryLayout targetType, Arena arena){
+        return p.reinterpret(targetType.byteSize(), arena, null);
     }
 
     public static long getAddress(MemorySegment p){

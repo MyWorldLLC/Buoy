@@ -19,6 +19,7 @@ package com.myworldvw.buoy;
 import com.myworldvw.buoy.mapping.*;
 
 import java.lang.foreign.*;
+import java.lang.foreign.MemorySegment.Scope;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
@@ -170,16 +171,8 @@ public class NativeMapper {
     }
 
     public MemorySegment getGlobalSymbol(String name, Class<?> type){
-        return getGlobalSymbol(name, type, null);
-    }
-
-    public MemorySegment getGlobalSymbol(String name, Class<?> type, SegmentScope scope){
         return lookup.find(name)
-                .map(symbol -> MemorySegment.ofAddress(
-                        symbol.address(),
-                        sizeOf(type),
-                        scope != null ? scope : SegmentScope.auto()
-                ))
+                .map(symbol -> MemorySegment.ofAddress(symbol.address()).reinterpret(sizeOf(type)))
                 .orElseThrow(() -> new IllegalArgumentException("Symbol " + name + " not found"));
     }
 
@@ -240,17 +233,28 @@ public class NativeMapper {
         return layoutFor(type).byteSize();
     }
 
-    public MemorySegment allocate(Class<?> type, SegmentScope scope){
-        return Platform.allocate(getLayout(type), scope);
+    public MemorySegment allocate(Class<?> type, Arena arena){
+        return Platform.allocate(getLayout(type), arena);
     }
 
-    public <T> Array<T> arrayOf(MemorySegment array, Class<T> type, long length, SegmentScope scope){
-        return arrayOf(array, type, false, length, scope);
-    }
-
-    public <T> Array<T> arrayOf(MemorySegment array, Class<T> type, boolean isPointer, long length, SegmentScope scope){
-        var segment = Array.cast(array, getLayout(type), length, scope);
+    public <T> Array<T> arrayOf(MemorySegment array, Class<T> type, boolean isPointer, long length){
+        var segment = Array.cast(array, getLayout(type), length);
         return arrayOf(segment, type, isPointer);
+    }
+
+    public <T> Array<T> arrayOf(MemorySegment array, Class<T> type, boolean isPointer, long length, Arena arena){
+        var segment = Array.cast(array, getLayout(type), length, arena);
+        return arrayOf(segment, type, isPointer);
+    }
+
+    public <T> Array<T> arrayOf(MemorySegment array, Class<T> type, long length){
+        var segment = Array.cast(array, getLayout(type), length);
+        return arrayOf(segment, type);
+    }
+
+    public <T> Array<T> arrayOf(MemorySegment array, Class<T> type, long length, Arena arena){
+        var segment = Array.cast(array, getLayout(type), length, arena);
+        return arrayOf(segment, type);
     }
 
     public <T> Array<T> arrayOf(MemorySegment array, Class<T> type){
@@ -281,7 +285,7 @@ public class NativeMapper {
 
             // Track largest element so that we can set
             // end padding of the struct accordingly
-            if(largestElement == null || largestElement.bitSize() < layout.bitSize()){
+            if(largestElement == null || largestElement.byteSize() < layout.byteSize()){
                 largestElement = layout;
             }
 
@@ -289,12 +293,12 @@ public class NativeMapper {
                 var padding = makePadding(structSize, layout);
                 if(padding != null){
                     layouts.add(padding);
-                    structSize += padding.bitSize();
+                    structSize += padding.byteSize();
                 }
             }
 
             layouts.add(layout);
-            structSize += layout.bitSize();
+            structSize += layout.byteSize();
 
         }
 
@@ -313,8 +317,8 @@ public class NativeMapper {
         if(structSize == 0){
             return null; // Struct has no elements yet, so we don't need padding
         }
-        var remainder = structSize % element.bitAlignment();
-        return remainder != 0 ? MemoryLayout.paddingLayout(element.bitAlignment() - remainder) : null;
+        var remainder = structSize % element.byteAlignment();
+        return remainder != 0 ? MemoryLayout.paddingLayout(element.byteAlignment() - remainder) : null;
     }
 
     public <T> NativeMapper register(Class<T> targetType){
@@ -400,7 +404,7 @@ public class NativeMapper {
         return objectHandlers.containsKey(targetType);
     }
 
-    public MemorySegment toCFunction(Object target, String method, SegmentScope scope) throws IllegalAccessException {
+    public MemorySegment toCFunction(Object target, String method, Arena arena) throws IllegalAccessException {
 
         var candidates = Arrays.stream(target.getClass().getMethods()).filter(m -> m.getName().equals(method)).toList();
         if(candidates.size() > 1){
@@ -411,10 +415,10 @@ public class NativeMapper {
             throw new IllegalArgumentException("Method %s not found for type %s".formatted(method, target.getClass()));
         }
 
-        return toCFunction(target, candidates.get(0), scope);
+        return toCFunction(target, candidates.get(0), arena);
     }
 
-    public MemorySegment toCFunction(Object target, String method, SegmentScope scope, Class<?> retType, Class<?>... paramTypes) throws IllegalAccessException {
+    public MemorySegment toCFunction(Object target, String method, Arena arena, Class<?> retType, Class<?>... paramTypes) throws IllegalAccessException {
 
         var candidate = Arrays.stream((target instanceof Class ? ((Class<?>) target) : target.getClass()).getMethods())
                 .filter(m -> m.getName().equals(method))
@@ -424,15 +428,15 @@ public class NativeMapper {
 
         var m = candidate.orElseThrow(() -> new IllegalArgumentException("Method %s not found for type %s".formatted(method, target.getClass())));
 
-        return toCFunction(target, m, scope);
+        return toCFunction(target, m, arena);
     }
 
-    public MemorySegment toCFunction(Object target, Method method, SegmentScope scope) throws IllegalAccessException {
+    public MemorySegment toCFunction(Object target, Method method, Arena arena) throws IllegalAccessException {
         var handle = MethodHandles.lookup().unreflect(method);
         if((method.getModifiers() & Modifier.STATIC) != 0){
             handle.bindTo(target);
         }
-        return Platform.toCFunction(handle, getFunctionDescriptor(method), scope);
+        return Platform.toCFunction(handle, getFunctionDescriptor(method), arena);
     }
 
     public FunctionDescriptor getFunctionDescriptor(Method m){

@@ -17,6 +17,7 @@
 package com.myworldvw.buoy;
 
 import java.lang.foreign.*;
+import java.lang.foreign.MemorySegment.Scope;
 import java.lang.invoke.MethodHandle;
 import java.nio.file.Path;
 
@@ -31,8 +32,8 @@ public class Platform {
         return b ? C_TRUE : C_FALSE;
     }
 
-    public static MemorySegment toCFunction(MethodHandle method, FunctionDescriptor descriptor, SegmentScope scope){
-        return Linker.nativeLinker().upcallStub(method, descriptor, scope);
+    public static MemorySegment toCFunction(MethodHandle method, FunctionDescriptor descriptor, Arena arena){
+        return Linker.nativeLinker().upcallStub(method, descriptor, arena);
     }
 
     public static String standardLibraryName(String name){
@@ -44,40 +45,36 @@ public class Platform {
         };
     }
 
-    public static SymbolLookup loadLibrary(String libName, SegmentScope scope){
-        return SymbolLookup.libraryLookup(libName, scope);
+    public static SymbolLookup loadLibrary(String libName, Arena arena){
+        return SymbolLookup.libraryLookup(libName, arena);
     }
 
-    public static SymbolLookup loadLibrary(Path libPath, SegmentScope scope){
-        return SymbolLookup.libraryLookup(libPath, scope);
+    public static SymbolLookup loadLibrary(Path libPath, Arena arena){
+        return SymbolLookup.libraryLookup(libPath, arena);
     }
 
-    public static SegmentAllocator globalAllocator(){
-        return allocator(SegmentScope.global());
+    public static Arena globalArena(){
+        return Arena.global();
     }
 
-    public static SegmentAllocator autoAllocator(){
-        return allocator(SegmentScope.auto());
-    }
-
-    public static SegmentAllocator allocator(SegmentScope scope){
-        return SegmentAllocator.nativeAllocator(scope);
+    public static Arena autoArena(){
+        return Arena.ofAuto();
     }
 
     public static MemorySegment allocate(MemoryLayout layout){
-        return allocate(layout, SegmentScope.global());
+        return allocate(layout, Arena.global());
     }
 
     public static MemorySegment allocate(MemoryLayout layout, long count){
-        return allocate(layout, count, SegmentScope.global());
+        return allocate(layout, count, Arena.global());
     }
 
-    public static MemorySegment allocate(MemoryLayout layout, SegmentScope scope){
-        return allocate(layout, 1, scope);
+    public static MemorySegment allocate(MemoryLayout layout, Arena arena){
+        return allocate(layout, 1, arena);
     }
 
-    public static MemorySegment allocate(MemoryLayout layout, long count, SegmentScope scope){
-        return MemorySegment.allocateNative(layout.byteSize() * count, scope);
+    public static MemorySegment allocate(MemoryLayout layout, long count, Arena arena){
+        return arena.allocate(layout.byteSize() * count);
     }
 
     public static long offsetOf(MemoryLayout structLayout, String field){
