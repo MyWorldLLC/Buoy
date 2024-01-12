@@ -324,6 +324,11 @@ public class NativeMapper {
         return remainder != 0 ? MemoryLayout.paddingLayout(element.byteAlignment() - remainder) : null;
     }
 
+    public <T> NativeMapper register(Class<T> targetType, MemoryLayout customLayout){
+        layouts.put(targetType, customLayout);
+        return this;
+    }
+
     public <T> NativeMapper register(Class<T> targetType){
         return register(targetType, false);
     }
@@ -404,8 +409,7 @@ public class NativeMapper {
     }
 
     public <T extends Enum<?>> NativeMapper registerEnum(Class<T> enumeration){
-        layouts.put(enumeration, ValueLayout.JAVA_INT);
-        return this;
+        return register(enumeration, ValueLayout.JAVA_INT);
     }
 
     public boolean isRegistered(Class<?> targetType){
