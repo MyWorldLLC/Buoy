@@ -400,7 +400,7 @@ public class NativeMapper {
         return this;
     }
 
-    public <T extends Enum<?>> NativeMapper registerEnum(T enumeration){
+    public <T extends Enum<?>> NativeMapper registerEnum(Class<T> enumeration){
         layouts.put(enumeration.getClass(), ValueLayout.JAVA_INT);
         return this;
     }
