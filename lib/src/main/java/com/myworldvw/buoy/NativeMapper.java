@@ -19,7 +19,6 @@ package com.myworldvw.buoy;
 import com.myworldvw.buoy.mapping.*;
 
 import java.lang.foreign.*;
-import java.lang.foreign.MemorySegment.Scope;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;

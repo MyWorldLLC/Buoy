@@ -40,9 +40,9 @@ public class FieldHandler<T> implements StructMappingHandler<T> {
         this.field = field;
     }
 
+    // TODO - this doesn't work if this field references a struct value, since structs
+    // are not value layouts in Panama and the VarHandle can only access a value layout.
     public VarHandle getHandle(MemoryLayout layout){
-        System.out.println(layout.name().orElse(""));
-        System.out.println(model.name());
         return layout.varHandle(MemoryLayout.PathElement.groupElement(model.name()));
     }
 
