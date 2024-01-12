@@ -137,6 +137,9 @@ public class NativeMapper {
     public MemoryLayout getLayout(Class<?> targetType){
         var layout = layouts.get(targetType);
         if(layout == null){
+            if(targetType.isEnum()){
+                return ValueLayout.JAVA_INT;
+            }
             var structAnnotation = getStructAnnotation(targetType);
             var structDef = structs.get(structAnnotation.name());
             if(structDef == null){
