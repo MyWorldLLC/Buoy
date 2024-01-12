@@ -41,6 +41,8 @@ public class FieldHandler<T> implements StructMappingHandler<T> {
     }
 
     public VarHandle getHandle(MemoryLayout layout){
+        System.out.println(layout.name().orElse(""));
+        System.out.println(model.name());
         return layout.varHandle(MemoryLayout.PathElement.groupElement(model.name()));
     }
 
