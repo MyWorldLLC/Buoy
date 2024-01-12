@@ -1,6 +1,6 @@
-module buoy.lib.main {
+module com.myworldvw.buoy {
     requires java.base;
 
-    opens com.myworldvw.buoy;
-    opens com.myworldvw.buoy.mapping;
+    exports com.myworldvw.buoy;
+    exports com.myworldvw.buoy.mapping;
 }
