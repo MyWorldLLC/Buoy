@@ -17,7 +17,6 @@
 package com.myworldvw.buoy;
 
 import java.lang.foreign.*;
-import java.lang.foreign.MemorySegment.Scope;
 
 public record Array<T>(MemorySegment array, MemoryLayout typeLayout, Class<T> carrierType, boolean isPointer) {
 

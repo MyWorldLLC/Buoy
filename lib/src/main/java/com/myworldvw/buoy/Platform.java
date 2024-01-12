@@ -17,7 +17,6 @@
 package com.myworldvw.buoy;
 
 import java.lang.foreign.*;
-import java.lang.foreign.MemorySegment.Scope;
 import java.lang.invoke.MethodHandle;
 import java.nio.file.Path;
 
