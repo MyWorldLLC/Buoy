@@ -400,6 +400,11 @@ public class NativeMapper {
         return this;
     }
 
+    public <T extends Enum<?>> NativeMapper registerEnum(T enumeration){
+        layouts.put(enumeration.getClass(), ValueLayout.JAVA_INT);
+        return this;
+    }
+
     public boolean isRegistered(Class<?> targetType){
         return objectHandlers.containsKey(targetType);
     }
