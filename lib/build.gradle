@@ -25,21 +25,21 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(22)
     }
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs.add('--enable-preview')
+    //options.compilerArgs.add('--enable-preview')
 }
 
 tasks.withType(Test).configureEach {
-    jvmArgs += '--enable-preview'
+    //jvmArgs += '--enable-preview'
     jvmArgs += '--enable-native-access=ALL-UNNAMED'
 }
 
 compileTestGroovy {
-    options.compilerArgs.add('--enable-preview')
+    //options.compilerArgs.add('--enable-preview')
     options.compilerArgs.add('--enable-native-access=ALL-UNNAMED')
 }
 
@@ -47,7 +47,8 @@ test {
     useJUnitPlatform()
     // TODO - support non-Linux lib names
     systemProperty "buoy.test.lib.path", new File(parent.projectDir.absoluteFile, "native/build/lib/main/debug/").toPath().toString()
-    jvmArgs(['--enable-preview', '--enable-native-access=ALL-UNNAMED'])
+    jvmArgs(['--enable-native-access=ALL-UNNAMED'])
+    //jvmArgs(['--enable-preview', '--enable-native-access=ALL-UNNAMED'])
 }
 
 publishing {

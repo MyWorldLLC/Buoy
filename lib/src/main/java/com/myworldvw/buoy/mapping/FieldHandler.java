@@ -25,6 +25,7 @@ import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 
@@ -43,7 +44,8 @@ public class FieldHandler<T> implements StructMappingHandler<T> {
     // TODO - this doesn't work if this field references a struct value, since structs
     // are not value layouts in Panama and the VarHandle can only access a value layout.
     public VarHandle getHandle(MemoryLayout layout){
-        return layout.varHandle(MemoryLayout.PathElement.groupElement(model.name()));
+        var handle = layout.varHandle(MemoryLayout.PathElement.groupElement(model.name()));
+        return MethodHandles.insertCoordinates(handle, 1, 0L);
     }
 
     public MethodHandle getAccessor(MemoryLayout layout, VarHandle.AccessMode mode){
