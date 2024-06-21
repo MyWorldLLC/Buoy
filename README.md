@@ -79,15 +79,6 @@ Buoy's advantages:
 Buoy's disadvantages:
 * You still have to hand-write and maintain binding code. 
   For large API surfaces this may not be desirable.
-  
-
-Note that Panama is currently a preview feature of the JDK and
-changes with every Java release. You should consider Buoy to be
-of the same status for now - it may slightly lag JDK releases
-as it takes time to accommodate Panama API changes, wait for Gradle
-to support the newest JDK releases, etc. Buoy's API is also undergoing
-its own evolution right now, and will not stabilize until Panama does
-(at the soonest).
 
 ## Project Structure
 Buoy itself resides in [lib/](./lib), and a small, simple example native
