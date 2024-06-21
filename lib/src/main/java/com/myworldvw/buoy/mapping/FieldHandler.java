@@ -41,8 +41,9 @@ public class FieldHandler<T> implements StructMappingHandler<T> {
         this.field = field;
     }
 
-    // TODO - this doesn't work if this field references a struct value, since structs
+    // Note that this doesn't work if this field references a struct value, since structs
     // are not value layouts in Panama and the VarHandle can only access a value layout.
+    // To access nested structs, use a struct model class.
     public VarHandle getHandle(MemoryLayout layout){
         var handle = layout.varHandle(MemoryLayout.PathElement.groupElement(model.name()));
         return MethodHandles.insertCoordinates(handle, 1, 0L);
